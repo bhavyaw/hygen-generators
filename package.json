@@ -1,0 +1,8 @@
+{
+  "name": "hygen-generators",
+  "version": "0.1.1",
+  "description": "Personal collection of hygen generators",
+  "main": "index.js",
+  "author": "bhavya wadhwa",
+  "license": "MIT"
+}
