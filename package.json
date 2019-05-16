@@ -1,8 +1,12 @@
 {
-  "name": "hygen-generators",
+  "name": "@bhavya_w/hygen-generators",
   "version": "0.1.1",
   "description": "Personal collection of hygen generators",
   "main": "index.js",
   "author": "bhavya wadhwa",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "^4.17.11",
+    "shelljs": "^0.8.3"
+  }
 }
