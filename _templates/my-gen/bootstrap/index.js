@@ -4,9 +4,14 @@ const packageJson = require(process.cwd() + "/package.json");
 const get = require("lodash/get");
 const isEmpty = require("lodash/isEmpty");
 
+if (!isEmpty(packageJson)) {
+  throw new Error("Package json is either empty or missing")
+}
+
+
 module.exports = {
   prompt: async ({ prompter, args }) => {
-console.log(__dirname, typeof h, process.cwd());
+  console.log(__dirname, typeof h, process.cwd());
 
       const useBootstrap = {
         type : 'confirm',
@@ -31,7 +36,7 @@ console.log(__dirname, typeof h, process.cwd());
   
         // commands
         const isBootstrapInstalled = get(packageJson, "dependencies.bootstrap");
-        if (answers.useBootstrap && !isEmpty(packageJson) && !isBootstrapInstalled) {
+        if (answers.useBootstrap && !isBootstrapInstalled) {
           // install bootstrap
           console.log("installing bootstrap...")
           shell.exec('yarn add bootstrap', function(code, stdout, stderr) {
