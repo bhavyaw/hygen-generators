@@ -21,8 +21,23 @@ module.exports = {
   entry : mainChunks,
   module : {
     rules : [
-
+      <% if (language === 'JS') { %>{
+            test: /\.js$/,
+            exclude: /node_modules/,
+            loader: 'babel-loader',
+      },<% } %>
+      <% if (webpackBasic.includes('css')) { %>{
+          test: /\.css$/,
+          use: [
+            {
+              loader: 'style-loader' // Creates style nodes from JS strings
+            },
+            {
+              loader: 'css-loader' // Translates CSS into CommonJS
+            }
+          ]
+      },
+      <% } %>
     ]
   }
 };
-
