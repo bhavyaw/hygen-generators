@@ -1,0 +1,6 @@
+
+{
+  "files.exclude": {
+    "yarn.lock" : true
+  },
+}

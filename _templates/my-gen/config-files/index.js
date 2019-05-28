@@ -1,33 +1,37 @@
+const {addNewPackage} = require('../../../commands');
+
 // my-generator/my-action/index.js
 module.exports = {
   prompt: async ({ prompter, args }) => {
-      const gitignorePrompt = {
-        type : 'confirm',
-        name : 'gitignore',
-        message : "Do you want to add a basic gitignore file"
+      const envFileTypes = {
+        type : "multiselect",
+        name : "envFileTypes",
+        message : "Select Config Files ?",
+        choices : [
+          { name: 'local', message: 'Local', value : true },
+          { name : 'development', message : 'Development', value : true},
+          { name : 'production', message : 'Prod', enabled : true},
+        ]
       };
-
-      const prettierPrompt = {
-        type : 'confirm',
-        name : 'prettier',
-        message : "Do you want to a basic prettier configuration file to the project ?"
-      };
-
-      const lintingPrompt = {
-        type : "confirm",
-        name : "linting",
-        message : "Do you want to setup linting - eslint for JavaScript based projects or tslint for Typescript based projects"
-      };
-
-
+     
       const initialPrompts = [
-        gitignorePrompt,
-        prettierPrompt,
-        lintingPrompt
-      ]
+        envFileTypes
+      ];
 
-      // 1st prompt
       const answers = await prompter.prompt(initialPrompts);
+
+      if (answers.length) {
+
+      }
+      console.log("answers are : \n", answers);
+      await executeCommands(answers);
       return answers;
+  }
+}
+
+
+async function executeCommands(answers) {
+  if (answers.envFileTypes.length) {
+    await addNewPackage("dotenv");
   }
 }

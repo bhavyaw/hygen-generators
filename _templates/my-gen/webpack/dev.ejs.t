@@ -1,5 +1,5 @@
 ---
-to: "<%= h.src() %>/config/webpack.dev.js"
+to: "<%= h.src() %>/builds/webpack.dev.js"
 ---
 
 

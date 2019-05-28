@@ -1,6 +1,5 @@
 ---
-to: "<%= h.src() %>/.prettier"
-sh : "npx prettier || yarn add -D prettier"
+to: "<%= configFiles.includes('prettier') ? h.src() + '/.prettier' : null %>"
 ---
 {
   "singleQuote": true,

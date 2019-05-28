@@ -1,3 +1,4 @@
+const {addNewPackage} = require('../../../commands');
 
 module.exports = {
   prompt : async ({prompter, args}) => {
