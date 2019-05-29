@@ -1,4 +1,5 @@
 const {addNewPackage} = require('../../../commands');
+const path = require("path");
 
 module.exports = {
   prompt : async ({prompter, args}) => {
@@ -14,18 +15,6 @@ module.exports = {
       ]
     };
 
-    const commonRequirementsPrompts = {
-        type : 'multiselect',
-        name: 'webpackBasic',
-        message: '\nPlease select your webpack requirements ( using spacebar ): \n',
-        choices: [
-          { name: 'es6', message: 'ES6+ Compilation ( using babel loader )', value : true, enabled : true },
-          { name : 'images', message : 'Images Loader', value : true},
-          { name : 'css', message : 'CSS', enabled : true},
-          { name : 'inlineImages', message : 'Inline Images <8kb ( Optimization )'},
-        ]
-    };
-
     const srcDirPathPrompt = {
       type : 'input',
       name: 'srcDir',
@@ -34,13 +23,30 @@ module.exports = {
       initial : './'
     };
 
-    promptAnswers = await prompter.prompt(languageUsedPrompt);
-    Object.assign(promptAnswers, await prompter.prompt(commonRequirementsPrompts));
-    Object.assign(promptAnswers, await prompter.prompt(srcDirPathPrompt));
+    const commonRequirementsPrompts = {
+        type : 'multiselect',
+        name: 'webpackBasic',
+        message: '\nPlease select your webpack requirements ( using spacebar ): \n',
+        choices: [
+          { name:  'es6', message: 'ES6+ Compilation ( using babel loader )', value : true },
+          { name : 'images', message : 'Images Loader', value : true},
+          { name : 'fonts', message : 'Fonts Loader', value : true},
+          { name : 'css', message : 'CSS', value : true},
+        ]
+    };
 
+    promptAnswers = await prompter.prompt(languageUsedPrompt);
+    Object.assign(promptAnswers, await prompter.prompt(srcDirPathPrompt));
+    Object.assign(promptAnswers, await prompter.prompt(commonRequirementsPrompts));
+
+    // const absoluteSrcDirectoryPath = path.resolve(promptAnswers.srcDir);
+    // console.log("absolute source directory path : ", absoluteSrcDirectoryPath);
     console.log('webpack common requirements : ', JSON.stringify(promptAnswers, undefined, 4));
 
-    // run required commoands
+    // Object.assign(promptAnswers, {
+    //   srcDir : absoluteSrcDirectoryPath
+    // });
+    // // run required commoands
     await executeCommands(promptAnswers);
     return promptAnswers;
   }
@@ -52,7 +58,12 @@ async function executeCommands(promptAnswers) {
     await addNewPackage('style-loader');
   }
 
-  if (promptAnswers.webpackBasic.includes('inline-images')) {
+  if (promptAnswers.webpackBasic.includes('images')) {
+    await addNewPackage('url-loader');
+    await addNewPackage('file-loader');
+  }
+
+  if (promptAnswers.webpackBasic.includes('fonts')) {
     await addNewPackage('url-loader');
   }
 }

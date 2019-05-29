@@ -1,5 +1,5 @@
 ---
-to: "<%= h.src() %>/builds/webpack.common.js"
+to: "<%= h.src() %>/webpack/webpack.common.js"
 ---
 const path = require('path');
 const webpackGlobEntries = require('webpack-glob-entries');
@@ -37,8 +37,37 @@ module.exports = {
               loader: 'css-loader' // Translates CSS into CommonJS
             }
           ]
-      },
-      <% } %>
+      },<% } %>
+      <% if (webpackBasic.includes('images') %>{
+        test: /\.svg$/,
+        use: "file-loader",
+      },<% } %>
+      <% if (webpackBasic.includes('images')) { %>{
+          test: /\.(png|jpg|jpeg|gif)$/,
+          //exclude: path.resolve(__dirname, "../src/assets/images/source"),
+          use: [
+              {
+                  loader: "url-loader",
+                  options: {
+                      limit: 8192,
+                      name: "images/[path][name].[ext]?[hash]",
+                      //publicPath: ""
+                  }
+              }
+          ]
+      },<% } %>
+      <% if (webpackBasic.includes('fonts')) { %>{
+          test: /\.(woff|woff2|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
+          use: {
+              loader: "url-loader",
+              options: {
+                  limit: 8192,
+                  name: "fonts/[name].[ext]?[hash]"
+                  // publicPath: "../", // Take the directory into account
+              }
+          }
+      },<% } %>
+
     ]
   }
 };

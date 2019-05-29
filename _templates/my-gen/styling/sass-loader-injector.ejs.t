@@ -2,6 +2,7 @@
 inject: true
 to: "<%= h.src() %>/config/webpack.common.js"
 after: rules\s*\:\s*\[
+skip_if : ['"]sass-loader['"]
 ---
 <% if (styling.includes('sass')) { %>{
   test: /\.scss$/,
