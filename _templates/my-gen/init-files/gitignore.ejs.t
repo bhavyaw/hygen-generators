@@ -6,5 +6,19 @@ node_modules
 dist/
 
 ### Environment Files
-environments/
+/config
 *.env
+
+# production
+/build
+
+# misc
+.DS_Store
+.env.local
+.env.development
+.env.test.local
+.env.production
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

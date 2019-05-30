@@ -2,8 +2,10 @@
 to: "<%= h.src() %>/webpack/webpack.prod.js"
 ---
 
+const merge = require("webpack-merge");
+const common = require("./webpack.common.js");
 
-module.exports = {
-  
-};
+module.exports = merge(common, {
+  mode: "production"
+});
 

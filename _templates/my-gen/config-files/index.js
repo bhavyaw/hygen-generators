@@ -1,4 +1,4 @@
-const {addNewPackage} = require('../../../commands');
+const {addNewPackage} = require('../../../utils');
 
 // my-generator/my-action/index.js
 module.exports = {

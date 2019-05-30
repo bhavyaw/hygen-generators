@@ -1,19 +1,23 @@
 const shell = require("shelljs");
 const get = require("lodash/get");
 const isEmpty = require("lodash/isEmpty");
-const path = require("path");
+const readPkg = require('read-pkg');
 
-const packageJsonPath = path.join(process.cwd(), "/package.json");
-const packageJson = require(packageJsonPath);
+
+// TODO : use better option than process.cwd()
+// const packageJsonPath = path.join(process.cwd(), "/package.json");
+// const packageJson = awaitrequire(packageJsonPath);
+
+const packageJson = readPkg.sync();
 
 if (isEmpty(packageJson)) {
   throw new Error("Package json is either empty or missing")
-}
+} 
 
 module.exports = {
   addNewPackage,
   shellExecAsync
-}
+};
 
 /**
  * @param {*} packageName 

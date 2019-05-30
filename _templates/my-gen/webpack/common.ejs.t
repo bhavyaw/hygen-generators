@@ -22,11 +22,11 @@ module.exports = {
   entry : mainChunks,
   module : {
     rules : [
-      <% if (language === 'JS') { %>{
-            test: /\.js$/,
-            exclude: /node_modules/,
-            loader: 'babel-loader',
-      },<% } %>
+      {
+          test:/\.[jt]sx?$/,
+          exclude: /node_modules/,
+          loader: 'babel-loader',
+      },  
       <% if (webpackBasic.includes('css')) { %>{
           test: /\.css$/,
           use: [
@@ -38,7 +38,7 @@ module.exports = {
             }
           ]
       },<% } %>
-      <% if (webpackBasic.includes('images') %>{
+      <% if (webpackBasic.includes('images')) { %>{
         test: /\.svg$/,
         use: "file-loader",
       },<% } %>
@@ -69,5 +69,13 @@ module.exports = {
       },<% } %>
 
     ]
-  }
+  },
+  resolve: {
+    <% if (language === 'TS') {%>
+      extensions: ['.ts', '.tsx', '.js'],
+    <% } %>
+    <% if (language === 'JS') {%>
+      extensions: ['.js', '.jsx'],
+    <% } %>
+  },
 };

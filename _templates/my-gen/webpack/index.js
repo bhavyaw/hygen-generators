@@ -1,14 +1,24 @@
-const {addNewPackage} = require('../../../commands');
-const path = require("path");
+const {addNewPackage} = require('../../../utils');
+const writePackage = require('write-pkg');
 
 module.exports = {
   prompt : async ({prompter, args}) => {
     let promptAnswers =  {};
 
+    const projectTypePrompt = {
+      type : 'multiselect',
+      name : 'projectType',
+      message : 'Please select the Project Type',
+      choices : [
+        {name : 'react', message : 'React', value : true},
+        {name : 'chromeExtension', message : 'Chrome Extension', value : true}
+      ]
+    };
+
     const languageUsedPrompt = {
       type : 'select',
       name : 'language',
-      message : 'Please select the language for the project...',
+      message : 'Please select the Project Type',
       choices : [
         {name : 'JS', message : 'JavaScript', value : true},
         {name : 'TS', message : 'Typescript', value : true}
@@ -28,16 +38,26 @@ module.exports = {
         name: 'webpackBasic',
         message: '\nPlease select your webpack requirements ( using spacebar ): \n',
         choices: [
-          { name:  'es6', message: 'ES6+ Compilation ( using babel loader )', value : true },
           { name : 'images', message : 'Images Loader', value : true},
           { name : 'fonts', message : 'Fonts Loader', value : true},
           { name : 'css', message : 'CSS', value : true},
         ]
     };
 
-    promptAnswers = await prompter.prompt(languageUsedPrompt);
-    Object.assign(promptAnswers, await prompter.prompt(srcDirPathPrompt));
-    Object.assign(promptAnswers, await prompter.prompt(commonRequirementsPrompts));
+    const initialPrompts = [
+      projectTypePrompt,
+      languageUsedPrompt,
+      srcDirPathPrompt,
+      commonRequirementsPrompts
+    ]
+
+    promptAnswers = await prompter.prompt(initialPrompts);
+
+    // babel configuration
+    if (promptAnswers.language === 'JS' && promptAnswers.webpackBasic.es6) {
+      
+
+    }
 
     // const absoluteSrcDirectoryPath = path.resolve(promptAnswers.srcDir);
     // console.log("absolute source directory path : ", absoluteSrcDirectoryPath);
@@ -53,6 +73,8 @@ module.exports = {
 }
 
 async function executeCommands(promptAnswers) {
+  await addNewPackage('webpack webpack-cli webpack-dev-server webpack-merge write-pkg cross-env');
+
   if (promptAnswers.webpackBasic.includes('CSS')) {
     await addNewPackage('css-loader');
     await addNewPackage('style-loader');
@@ -66,6 +88,42 @@ async function executeCommands(promptAnswers) {
   if (promptAnswers.webpackBasic.includes('fonts')) {
     await addNewPackage('url-loader');
   }
+
+  // babel loaders
+  if (language === 'JS') {
+    await addNewPackage('@babel/core @babel/preset-env babel-loader');
+  }
+
+  if (language === 'TS') {
+    await addEventListener('@babel/preset-typescript @babel/proposal-class-properties @babel/proposal-object-rest-spread');
+  }
+
+  if (projectType === 'react') {
+    await addNewPackage('@babel/preset-reac babel-plugin-transform-react-remove-prop-types')
+    await addNewPackage('prop-types react react-dom', 'dev');
+  }
+
+  // writing to package JSON 
+  await writePackage({
+    "scripts" : {
+      "start": "cross-env NODE_ENV=development webpack-dev-server --./webpack/config webpack.dev.js --mode development --progress",
+      "build": "cross-env NODE_ENV=production webpack --config ./webpack/webpack.prod.js --mode production --progress", 
+    },
+    "browserslist": {
+      "development": [
+        "last 2 chrome versions",
+        "last 2 firefox versions",
+        "last 2 edge versions"
+      ],
+      "production": [
+        ">1%",
+        "last 4 versions",
+        "Firefox ESR",
+        "not ie < 11"
+      ]
+    }
+  });
+  
 }
 
 /**
