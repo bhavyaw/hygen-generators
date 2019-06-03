@@ -5,17 +5,16 @@ const merge = require("webpack-merge");
 const common = require("./webpack.common.js");
 
 module.exports = merge(common, {
-    devtool : 'eval-source-map',
-    devServer: {
-      port: 9000,
-      contentBase: path.join(__dirname, "dist"),
-      clientLogLevel: 'none',   
-      watchContentBase: true,
-      compress: true,
-      open: true,
-      hot : true,
-      stats: 'errors-only',
-      overlay: true
-    }
+    devtool : 'cheap-module-eval-source-map',
+    <% if (projectType.includes('chromeExtension')) { %>
+    output : {
+        path: path.join(__dirname, '../dist/js'),
+        filename: '[name].[chunkhash].js'
+    },<% } %>
+    <% if (!projectType.includes('chromeExtension')) { %>
+    output : {
+        path: path.join(__dirname, '../dist'),
+        filename: '[name].[chunkhash].js'
+    },<% } %>
 });
 

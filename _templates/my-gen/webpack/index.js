@@ -78,6 +78,7 @@ async function executeCommands(promptAnswers) {
   if (promptAnswers.webpackBasic.includes('CSS')) {
     await addNewPackage('css-loader');
     await addNewPackage('style-loader');
+    await addNewPackage('mini-css-extract-plugin');
   }
 
   if (promptAnswers.webpackBasic.includes('images')) {
@@ -103,6 +104,15 @@ async function executeCommands(promptAnswers) {
     await addNewPackage('prop-types react react-dom', 'dev');
   }
 
+  // webpack plugins
+
+  await addNewPackage('webpack-copy-plugin webpack-bundle-analyzer')
+
+  await addBrowserlistToPackageJson();
+  
+}
+
+async function addBrowserlistToPackageJson () {
   // writing to package JSON 
   await writePackage({
     "scripts" : {
@@ -123,7 +133,6 @@ async function executeCommands(promptAnswers) {
       ]
     }
   });
-  
 }
 
 /**

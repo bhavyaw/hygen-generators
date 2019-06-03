@@ -24,20 +24,31 @@ module.exports = {
  * @param {*} dependencyType {string} - "dev" | "normal"
  * @param {*} packageManager 
  */
-async function addNewPackage(packageName, dependencyType = "dev", packageManager = "yarn") {
+async function addNewPackage(packageName = "", dependencyType = "dev", packageManager = "yarn") {
+  packageName = packageName.split(/\s+/).filter(i => i.length);
+  const packages = [];
   if (isEmpty(packageName)) {
     throw new Error("Package name cannot be empty!!");
   }
 
-  dependencyType = dependencyType === "dev" ? "devDependencies" : "dependencies";
-  const isPackageInstalled = get(packageJson, [ dependencyType, packageName]);
-
-  console.log("inside addNewPackage : ", isPackageInstalled, packageName);
-
-  if (isPackageInstalled) {
-    console.log(`${packageName} is already installed.....skipping installation`);
+  if (packageName.length > 1) {
+    packages = [...packageName];
   } else {
-    return await shellExecAsync(`yarn add ${dependencyType ? "-D" : ""} ${packageName} `, {}, true);
+    packages = [packageName];
+  }
+
+  dependencyType = dependencyType === "dev" ? "devDependencies" : "dependencies";
+  for (let i = 0; i < packages.length; i++) {
+    const package = packages[i];
+    const isPackageInstalled = get(packageJson, [ dependencyType, package]);
+
+    console.log("inside addNewPackage : ", isPackageInstalled, package);
+  
+    if (isPackageInstalled) {
+      console.log(`${packageName} is already installed.....skipping installation`);
+    } else {
+      await shellExecAsync(`yarn add ${dependencyType ? "-D" : ""} ${package} `, {}, true);
+    }
   }
 }
 

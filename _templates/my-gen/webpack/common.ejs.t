@@ -5,6 +5,8 @@ const path = require('path');
 const webpackGlobEntries = require('webpack-glob-entries');
 const srcDirectoryPath = path.resolve(process.cwd(), "<%= srcDir %>");
 const originalEntriesHash = webpackGlobEntries(srcDirectoryPath);
+// plugins 
+const CopyPlugin = require('copy-webpack-plugin');
 const { pick, values } = require('lodash');
 // config files
 
@@ -18,10 +20,48 @@ console.log(`
   Main Chunks : ${mainChunks}
 `);
 
-module.exports = {
-  entry : mainChunks,
-  module : {
-    rules : [
+module.exports = function(env) {
+  const webpackConfig = {};
+  const rules = getRulesConfig(env);
+  const optimizations = getOptimizationConfig(env);
+
+  Object.assign(webpackConfig, {
+      devtool : 'eval-source-map',
+      entry : mainChunks,
+      <% if (!projectType.includes('chromeExtension')) { %>
+      devServer: {
+        port: 9000,
+        contentBase: path.join(__dirname, "dist"),
+        clientLogLevel: 'none',   
+        watchContentBase: true,
+        compress: true,
+        open: true,
+        hot : true,
+        stats: 'errors-only',
+        overlay: true
+      },<% } %>
+      module : {
+        rules
+      },
+      resolve: {
+        <% if (language === 'TS') {%>
+          extensions: ['.ts', '.tsx', '.js'],
+        <% } %>
+        <% if (language === 'JS') {%>
+          extensions: ['.js', '.jsx'],
+        <% } %>
+      },
+      optimization
+  });
+  // plugins
+  const plugins = getPluginConfig(env);
+  Object.assign(webpackConfig, {plugins})
+
+  return webpackConfig;
+}
+
+function getRulesConfig(env) {
+  const rules = [
       {
           test:/\.[jt]sx?$/,
           exclude: /node_modules/,
@@ -68,14 +108,44 @@ module.exports = {
           }
       },<% } %>
 
-    ]
-  },
-  resolve: {
-    <% if (language === 'TS') {%>
-      extensions: ['.ts', '.tsx', '.js'],
-    <% } %>
-    <% if (language === 'JS') {%>
-      extensions: ['.js', '.jsx'],
-    <% } %>
-  },
-};
+    ];
+
+    return rules;
+}
+
+
+
+function getPluginConfig(env) {
+  const plugins = [
+      new CopyPlugin([
+        { from: '<%= srcDir %>/assets' , to: 'dest/assets' },
+        // { from: '<%= srcDir %>/assets' , to: 'dest/assets' },
+      ], {
+      // ignore : [] // globs
+      }),
+  ];
+
+  if (env.analyzeBundle) {
+    plugins.push(new BundleAnalyzerPlugin());
+  }
+
+  return plugins;
+}
+
+function getOptimizationConfig(env) {
+  const optimization = {
+    runtimeChunk: 'single',
+    splitChunks: {
+        cacheGroups: {
+            node_vendors : {
+                test: /[\\/]node_modules[\\/]/,
+                name: 'vendors',
+                enforce: true,
+                chunks: 'all'
+            }
+        }
+    }
+  };
+
+  return optimation;
+}
