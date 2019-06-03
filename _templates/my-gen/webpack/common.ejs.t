@@ -23,12 +23,10 @@ console.log(`
 module.exports = function(env) {
   const webpackConfig = {};
   const rules = getRulesConfig(env);
-  const optimizations = getOptimizationConfig(env);
 
   Object.assign(webpackConfig, {
       devtool : 'eval-source-map',
-      entry : mainChunks,
-      <% if (!projectType.includes('chromeExtension')) { %>
+      entry : mainChunks,<% if (!projectType.includes('chromeExtension')) { %>
       devServer: {
         port: 9000,
         contentBase: path.join(__dirname, "dist"),
@@ -39,24 +37,20 @@ module.exports = function(env) {
         hot : true,
         stats: 'errors-only',
         overlay: true
-      },<% } %>
+      },<%}%>
       module : {
         rules
       },
-      resolve: {
-        <% if (language === 'TS') {%>
-          extensions: ['.ts', '.tsx', '.js'],
-        <% } %>
-        <% if (language === 'JS') {%>
-          extensions: ['.js', '.jsx'],
-        <% } %>
-      },
-      optimization
+      resolve: {<% if (language === 'TS') {%>
+          extensions: ['.ts', '.tsx', '.js'],<% } %><% if (language === 'JS') {%>
+          extensions: ['.js', '.jsx'],<% } %>
+      },<% if (!projectType.includes('chromeExtension')) { %>
+      optimization : getOptimizationConfig(env);
+      <%}%> 
   });
   // plugins
   const plugins = getPluginConfig(env);
   Object.assign(webpackConfig, {plugins})
-
   return webpackConfig;
 }
 
@@ -106,23 +100,45 @@ function getRulesConfig(env) {
                   // publicPath: "../", // Take the directory into account
               }
           }
-      },<% } %>
-
+      }<% } %>
     ];
 
     return rules;
 }
 
-
-
 function getPluginConfig(env) {
   const plugins = [
+      new webpack.ProgressPlugin(),
+      new CleanWebpackPlugin(),
       new CopyPlugin([
         { from: '<%= srcDir %>/assets' , to: 'dest/assets' },
         // { from: '<%= srcDir %>/assets' , to: 'dest/assets' },
       ], {
       // ignore : [] // globs
       }),
+     // in non-chrome extension apps we usually have a single index.html file
+     <% if (!projectType.includes('chromeExtension')) { %>
+      new HtmlWebpackPlugin({
+        inject: true,
+        chunks: ['index'],
+        filename: path.join(__dirname, '../dist/index.html'),
+        ...getHtmlMinificationConfig(env.production),
+      }),
+     <% } %>
+    <% if (projectType.includes('chromeExtension')) { %>
+      new HtmlWebpackPlugin({
+        inject: true,
+        chunks: ['popup'],
+        filename: path.join(__dirname, '../dist/popup.html'),
+        ...getHtmlMinificationConfig(env.production),
+      }),
+      new HtmlWebpackPlugin({
+        inject: true,
+        chunks: ['options'],
+        filename: path.join(__dirname, '../dist/options.html'),
+        ...getHtmlMinificationConfig(env.production),
+      }),
+     <% } %>
   ];
 
   if (env.analyzeBundle) {
@@ -136,12 +152,20 @@ function getOptimizationConfig(env) {
   const optimization = {
     runtimeChunk: 'single',
     splitChunks: {
+       chunks: 'all',
+       maxInitialRequests: Infinity,
+       minSize: 0,
         cacheGroups: {
-            node_vendors : {
+            vendor : {
                 test: /[\\/]node_modules[\\/]/,
-                name: 'vendors',
-                enforce: true,
-                chunks: 'all'
+                name(module) {
+                  // get the name. E.g. node_modules/packageName/not/this/part.js
+                  // or node_modules/packageName
+                  const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+
+                  // npm package names are URL-safe, but some servers don't like @ symbols
+                  return `npm.${packageName.replace('@', '')}`;
+                }
             }
         }
     }
@@ -149,3 +173,23 @@ function getOptimizationConfig(env) {
 
   return optimation;
 }
+
+function getHtmlMinificationConfig(production) {
+  return  production
+    ? {
+        minify: {
+          removeComments: true,
+          collapseWhitespace: true,
+          removeRedundantAttributes: true,
+          useShortDoctype: true,
+          removeEmptyAttributes: true,
+          removeStyleLinkTypeAttributes: true,
+          keepClosingSlash: true,
+          minifyJS: true,
+          minifyCSS: true,
+          minifyURLs: true,
+        },
+      }
+    : {};
+}
+ 

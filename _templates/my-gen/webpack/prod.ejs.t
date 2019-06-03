@@ -15,13 +15,13 @@ module.exports = merge(common, {
   },
   plugins : [
 
-    <% if(webpackBasic.includes('CSS')) {%>
+    <% if(webpackBasic.includes('css')) {%>
         new MiniCssExtractPlugin({
             filename: "css/app.[contenthash].min.css",
             allChunks: true
         }),
     <% } %>
-
+    new webpack.HashedModuleIdsPlugin()
   ]
 });
 

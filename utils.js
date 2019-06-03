@@ -26,7 +26,7 @@ module.exports = {
  */
 async function addNewPackage(packageName = "", dependencyType = "dev", packageManager = "yarn") {
   packageName = packageName.split(/\s+/).filter(i => i.length);
-  const packages = [];
+  let packages = [];
   if (isEmpty(packageName)) {
     throw new Error("Package name cannot be empty!!");
   }

@@ -49,15 +49,9 @@ module.exports = {
       languageUsedPrompt,
       srcDirPathPrompt,
       commonRequirementsPrompts
-    ]
+    ];
 
     promptAnswers = await prompter.prompt(initialPrompts);
-
-    // babel configuration
-    if (promptAnswers.language === 'JS' && promptAnswers.webpackBasic.es6) {
-      
-
-    }
 
     // const absoluteSrcDirectoryPath = path.resolve(promptAnswers.srcDir);
     // console.log("absolute source directory path : ", absoluteSrcDirectoryPath);
@@ -67,7 +61,7 @@ module.exports = {
     //   srcDir : absoluteSrcDirectoryPath
     // });
     // // run required commoands
-    await executeCommands(promptAnswers);
+    // await executeCommands(promptAnswers);
     return promptAnswers;
   }
 }
@@ -100,13 +94,13 @@ async function executeCommands(promptAnswers) {
   }
 
   if (projectType === 'react') {
-    await addNewPackage('@babel/preset-reac babel-plugin-transform-react-remove-prop-types')
+    await addNewPackage('@babel/preset-reac babel-plugin-transform-react-remove-prop-types');
     await addNewPackage('prop-types react react-dom', 'dev');
   }
 
   // webpack plugins
 
-  await addNewPackage('webpack-copy-plugin webpack-bundle-analyzer')
+  await addNewPackage('webpack-copy-plugin clean-webpack-plugin webpack-bundle-analyzer html-webpack-plugin');
 
   await addBrowserlistToPackageJson();
   

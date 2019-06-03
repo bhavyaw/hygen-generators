@@ -8,12 +8,12 @@ module.exports = merge(common, {
     devtool : 'cheap-module-eval-source-map',
     <% if (projectType.includes('chromeExtension')) { %>
     output : {
-        path: path.join(__dirname, '../dist/js'),
+        path: path.resolve(__dirname, '../dist/js'),
         filename: '[name].[chunkhash].js'
     },<% } %>
     <% if (!projectType.includes('chromeExtension')) { %>
     output : {
-        path: path.join(__dirname, '../dist'),
+        path: path.resolve(__dirname, '../dist'),
         filename: '[name].[chunkhash].js'
     },<% } %>
 });
