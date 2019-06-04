@@ -2,6 +2,7 @@ const shell = require("shelljs");
 const get = require("lodash/get");
 const isEmpty = require("lodash/isEmpty");
 const readPkg = require('read-pkg');
+const hygenConfig = require(process.cwd() + '/.hygen.js');
 
 
 // TODO : use better option than process.cwd()
@@ -14,9 +15,16 @@ if (isEmpty(packageJson)) {
   throw new Error("Package json is either empty or missing")
 } 
 
+if (isEmpty(hygenConfig)) {
+  console.error(`Hygen config not found!!!`);
+}
+
 module.exports = {
   addNewPackage,
-  shellExecAsync
+  shellExecAsync,
+  packageJson,
+  hygenConfig,
+  copyFiles
 };
 
 /**
@@ -52,6 +60,11 @@ async function addNewPackage(packageName = "", dependencyType = "dev", packageMa
   }
 }
 
+async function copyFiles(copyFrom, copyTo) {
+  const copyCommand = `cp ${copyFrom} ${copyTo}`;
+  console.log(`Inside copyFiles : `, copyCommand);
+  await shellExecAsync(copyCommand, {}, true);
+}
 
 function shellExecAsync(command, opts = {}, logError = false) {
   return new Promise((resolve, reject) => {
@@ -60,7 +73,7 @@ function shellExecAsync(command, opts = {}, logError = false) {
         resolve(stdout)
       } else {
         if (logError) {
-          console.error(stderr);
+          console.error("\n\n",stderr, "\n");
         }
       }
     });

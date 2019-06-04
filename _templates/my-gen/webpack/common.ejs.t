@@ -3,17 +3,30 @@ to: "<%= h.src() %>/webpack/webpack.common.js"
 ---
 const path = require('path');
 const webpackGlobEntries = require('webpack-glob-entries');
-const srcDirectoryPath = path.resolve(process.cwd(), "<%= srcDir %>");
+const srcDirectoryPath = path.resolve(process.cwd(), "<%= srcDir %>/**/*.{<%= language === 'JS' ? 'js,jsx' : 'ts,tsx' %>}");
 const originalEntriesHash = webpackGlobEntries(srcDirectoryPath);
 // plugins 
 const CopyPlugin = require('copy-webpack-plugin');
 const { pick, values } = require('lodash');
 // config files
-
-const mainChunks = pick(originalEntriesHash, [
+<% if (!projectType.includes('chromeExtension')) { %>
+let mainChunks = pick(originalEntriesHash, [
   'main-chunk-1',
-  'main-chunk-2'
-]);
+  'main-chunk-2',
+]);<%}%>
+<% if (projectType.includes('chromeExtension')) { %>
+let mainChunks = pick(originalEntriesHash, [
+  'popup',
+  'options',
+  'appConfig',
+  'appMessages',
+  'appConstants',
+  // other files - add manually
+]);<%}%>
+
+mainChunks[
+  'background'
+] = "<%=h.src() + '/background/main.' + (language === 'JS' ? 'js' : 'ts' ) %>";
 
 console.log(`
   Source Directory Path : ${srcDirectoryPath}
@@ -109,13 +122,30 @@ function getRulesConfig(env) {
 function getPluginConfig(env) {
   const plugins = [
       new webpack.ProgressPlugin(),
-      new CleanWebpackPlugin(),
+      new CleanWebpackPlugin(), <% if (projectType.includes('chromeExtension')) { %>
       new CopyPlugin([
-        { from: '<%= srcDir %>/assets' , to: 'dest/assets' },
-        // { from: '<%= srcDir %>/assets' , to: 'dest/assets' },
+        { from: (srcDir + '/assets') , to: 'dest/assets' },
+        // { from: (srcDir + '/assets) , to: 'dest/assets' },
       ], {
       // ignore : [] // globs
+      }),<%}%><% if (!projectType.includes('chromeExtension')) { %>
+      new CopyPlugin([
+          { from: path.join(__dirname, '../src/assets') , to: path.join(__dirname, '../dist/assets' },
+      ]), 
+      new HtmlWebpackPlugin({
+        inject: false,
+        chunks: ['popup'],
+        filename: path.join(__dirname, '../dist/popup.html'),
+        template : path.join(__dirname, '../src/popup/popup.html')
+        ...getHtmlMinificationConfig(env.production),
       }),
+      new HtmlWebpackPlugin({
+        inject: false,
+        chunks: ['options'],
+        filename: path.join(__dirname, '../dist/options.html'),
+        template : path.join(__dirname, '../src/options/options.html')
+        ...getHtmlMinificationConfig(env.production),
+      }),<%}%>
      // in non-chrome extension apps we usually have a single index.html file
      <% if (!projectType.includes('chromeExtension')) { %>
       new HtmlWebpackPlugin({
@@ -123,9 +153,7 @@ function getPluginConfig(env) {
         chunks: ['index'],
         filename: path.join(__dirname, '../dist/index.html'),
         ...getHtmlMinificationConfig(env.production),
-      }),
-     <% } %>
-    <% if (projectType.includes('chromeExtension')) { %>
+      }),<%}%><% if (projectType.includes('chromeExtension')) { %>
       new HtmlWebpackPlugin({
         inject: true,
         chunks: ['popup'],

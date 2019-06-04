@@ -1,4 +1,4 @@
-const {addNewPackage} = require('../../../utils');
+const {addNewPackage, packageJson} = require('../../../utils');
 const writePackage = require('write-pkg');
 
 module.exports = {
@@ -15,6 +15,7 @@ module.exports = {
       ]
     };
 
+    // common to all generators
     const languageUsedPrompt = {
       type : 'select',
       name : 'language',
@@ -25,12 +26,13 @@ module.exports = {
       ]
     };
 
+    // common to all generators
     const srcDirPathPrompt = {
       type : 'input',
       name: 'srcDir',
       message: '\nPlease Enter your source directory path \n',
       hint : "For eg : '../'   |   '../../'   |    './src/",
-      initial : './'
+      initial : './src'
     };
 
     const commonRequirementsPrompts = {
@@ -55,13 +57,14 @@ module.exports = {
 
     // const absoluteSrcDirectoryPath = path.resolve(promptAnswers.srcDir);
     // console.log("absolute source directory path : ", absoluteSrcDirectoryPath);
-    console.log('webpack common requirements : ', JSON.stringify(promptAnswers, undefined, 4));
+    console.log('webpack common requirements : ', promptAnswers, JSON.stringify(promptAnswers, undefined, 4));
 
     // Object.assign(promptAnswers, {
     //   srcDir : absoluteSrcDirectoryPath
     // });
     // // run required commoands
     // await executeCommands(promptAnswers);
+    await addBrowserlistToPackageJson(promptAnswers);
     return promptAnswers;
   }
 }
@@ -97,23 +100,17 @@ async function executeCommands(promptAnswers) {
     await addNewPackage('@babel/preset-reac babel-plugin-transform-react-remove-prop-types');
     await addNewPackage('prop-types react react-dom', 'dev');
   }
-
   // webpack plugins
-
   await addNewPackage('webpack-copy-plugin clean-webpack-plugin webpack-bundle-analyzer html-webpack-plugin');
-
-  await addBrowserlistToPackageJson();
-  
 }
 
-async function addBrowserlistToPackageJson () {
-  // writing to package JSON 
-  await writePackage({
-    "scripts" : {
-      "start": "cross-env NODE_ENV=development webpack-dev-server --./webpack/config webpack.dev.js --mode development --progress",
-      "build": "cross-env NODE_ENV=production webpack --config ./webpack/webpack.prod.js --mode production --progress", 
-    },
-    "browserslist": {
+async function addBrowserlistToPackageJson (promptAnswers) {
+  console.log("Webpack generator : Writing to package.json file!!!");
+  const jsonToAppend = {};
+  jsonToAppend["scripts"] = {
+    "build": "cross-env NODE_ENV=production webpack --config ./webpack/webpack.prod.js --mode production --progress", 
+  };
+  const browserslist = {
       "development": [
         "last 2 chrome versions",
         "last 2 firefox versions",
@@ -125,10 +122,16 @@ async function addBrowserlistToPackageJson () {
         "Firefox ESR",
         "not ie < 11"
       ]
-    }
-  });
-}
+  };
 
-/**
- *           { name: 'jsx', message : 'JSX Compilation ( For React - using babel loader )', value: true },
- */
+  if (promptAnswers.projectType === 'chrome-extension') {
+    jsonToAppend["scripts"]["dev"] = "cross-env NODE_ENV=development webpack -w --./webpack/config webpack.dev.js --mode development --progress";
+  } else {
+    jsonToAppend["browserslist"] = browserslist;
+    jsonToAppend["scripts"]["start"] = "cross-env NODE_ENV=development webpack-dev-server --./webpack/config webpack.dev.js --mode development --progress";
+  };
+
+  Object.assign(packageJson, jsonToAppend);
+  // writing to package JSON 
+  await writePackage(packageJson);
+}
