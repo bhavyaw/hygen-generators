@@ -86,6 +86,11 @@ concat-map@0.0.1:
   resolved "https://registry.yarnpkg.com/concat-map/-/concat-map-0.0.1.tgz#d8a96bd77fd68df7793a73036a3ba0d5405d477b"
   integrity sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=
 
+data-store@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/data-store/-/data-store-3.1.0.tgz#9464f2c8ac8cad5cd0ebb6992eaf354d7ea8c35c"
+  integrity sha512-MjbLiqz5IJFD/NZLztrrxc2LZ8KMc42kHWAUSxD/kp2ekzHE8EZfkYP4nQy15aPMwV5vac2dW21Ni72okNAwTQ==
+
 decamelize@^1.1.1:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/decamelize/-/decamelize-1.2.0.tgz#f6534d15148269b20352e7bee26f501f9a191290"

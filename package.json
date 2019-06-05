@@ -6,6 +6,7 @@
   "author": "bhavya wadhwa",
   "license": "MIT",
   "dependencies": {
+    "data-store": "^3.1.0",
     "ejs-lint": "^0.3.0",
     "lodash": "^4.17.11",
     "make-dir": "^3.0.0",

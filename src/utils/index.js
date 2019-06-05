@@ -8,7 +8,6 @@ const hygenConfig = require(process.cwd() + '/.hygen.js');
 // TODO : use better option than process.cwd()
 // const packageJsonPath = path.join(process.cwd(), "/package.json");
 // const packageJson = awaitrequire(packageJsonPath);
-
 const packageJson = readPkg.sync();
 
 if (isEmpty(packageJson)) {

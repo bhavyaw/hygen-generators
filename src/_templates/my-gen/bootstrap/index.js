@@ -1,13 +1,8 @@
 // my-generator/my-action/index.js
 const shell = require("shelljs");
-const packageJson = require(process.cwd() + "/package.json");
 const get = require("lodash/get");
 const isEmpty = require("lodash/isEmpty");
-
-if (!isEmpty(packageJson)) {
-  throw new Error("Package json is either empty or missing")
-}
-
+const {packageJson} = require('../../../utils');
 
 module.exports = {
   prompt: async ({ prompter, args }) => {
@@ -31,7 +26,16 @@ module.exports = {
           message : "Do you want configure bootstrap scss setup...Bootstrap best practices with scss"
         };
 
-        const answers2 = await prompter.prompt(boostrapBestPractices);
+         // common to all generators
+        const srcDirPathPrompt = {
+          type : 'input',
+          name: 'srcDir',
+          message: '\nPlease Enter your source directory path \n',
+          hint : "For eg : '../'   |   '../../'   |    './src/",
+          initial : './src'
+        };
+
+        const answers2 = await prompter.prompt([boostrapBestPractices, srcDirPathPrompt]);
         Object.assign(answers, answers2);
   
         // commands

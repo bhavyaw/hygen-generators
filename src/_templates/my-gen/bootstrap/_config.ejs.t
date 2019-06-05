@@ -1,5 +1,5 @@
 ---
-to: "<%= locals.bootstrapScss ? h.src() + '/assets/styles/bootstrap/_config.scss' : null %>"
+to: "<%= locals.bootstrapScss ? h.src() + '/' + srcDir + '/assets/styles/bootstrap/_config.scss' : null %>"
 ---
 // Core variables and mixins
 // state in March 2018

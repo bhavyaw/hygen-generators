@@ -23,7 +23,7 @@ to : "<%= h.src()%>/<%= srcDir %>/manifest.json"
                
             ],
             "js": [
-                "./js/contentScript1.js",
+                "./js/contentScript1.js"
             ]
         }
     ],<%}%>
@@ -35,7 +35,7 @@ to : "<%= h.src()%>/<%= srcDir %>/manifest.json"
         "persistent": <%=extensionModules.includes('persistentBackground') ? true : false %>
     },<% if (extensionModules.includes('webAccessibleScripts')) { %>
     "web_accessible_resources": [
-        "js/variableAccessScript.js",
+        "js/variableAccessScript.js"
     ], <%}%>
     "permissions": [
         "tabs",
