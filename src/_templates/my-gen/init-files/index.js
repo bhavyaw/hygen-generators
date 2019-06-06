@@ -6,7 +6,7 @@ module.exports = {
         name : "configFiles",
         message : "Select configuration settings",
         choices : [
-          {name : "gitignore", message : "Add git basic file to the project", value : true},
+          {name : "gitignore", message : "Add a basic gitignore  file to the project", value : true},
           {name : "prettier", message : "Add a basic prettier file to the project", value : true},
         ]
       }

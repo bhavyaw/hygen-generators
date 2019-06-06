@@ -1,5 +1,5 @@
 ---
-to: "<%= configFiles.includes('prettier') ? h.src() + '/.prettier' : null %>"
+to: "<%= configFiles.includes('prettier') ? h.src() + '/.prettierrc' : null %>"
 ---
 {
   "singleQuote": true,

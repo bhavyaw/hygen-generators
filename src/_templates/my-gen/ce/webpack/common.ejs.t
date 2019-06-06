@@ -113,14 +113,14 @@ function getPluginConfig(env) {
         chunks: ['popup'],
         filename: path.join(__dirname, '../dist/popup.html'),
         template : path.join(__dirname, '../src/popup/popup.html')
-        ...getHtmlMinificationConfig(env.production),
+        minify : getHtmlMinificationConfig(env.production),
       }),
       new HtmlWebpackPlugin({
         inject: false,
         chunks: ['options'],
         filename: path.join(__dirname, '../dist/options.html'),
         template : path.join(__dirname, '../src/options/options.html')
-        ...getHtmlMinificationConfig(env.production),
+        minify : getHtmlMinificationConfig(env.production),
       })
   ];
 
@@ -172,6 +172,6 @@ function getHtmlMinificationConfig(production) {
           minifyURLs: true,
         },
       }
-    : {};
+    : undefined;
 }
  

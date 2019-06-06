@@ -100,9 +100,47 @@ async function executeCommands(promptAnswers) {
     hygenConfig.templates + '/my-gen/ce/assets/*',
     path.normalize(promptAnswers.srcDir + '/assets')
   );
+  // npm packages
+  await addNodePackages();
 
   if (promptAnswers.viewLibrary.react) {
     await addNewPackage('react react-dom'); 
+  }
+}
+
+async function addNodePackages() {
+  // webpack core
+  await addNewPackage('webpack webpack-cli webpack-dev-server webpack-merge write-pkg cross-env');
+  // webpack plugins
+  await addNewPackage('webpack-copy-plugin clean-webpack-plugin webpack-bundle-analyzer html-webpack-plugin');
+
+  if (promptAnswers.webpack.includes('CSS')) {
+    await addNewPackage('css-loader');
+    await addNewPackage('style-loader');
+    await addNewPackage('mini-css-extract-plugin');
+  }
+
+  if (promptAnswers.webpack.includes('images')) {
+    await addNewPackage('url-loader');
+    await addNewPackage('file-loader');
+  }
+
+  if (promptAnswers.webpack.includes('fonts')) {
+    await addNewPackage('url-loader');
+  }
+
+  // babel loaders
+  if (promptAnswers.language === 'JS') {
+    await addNewPackage('@babel/core @babel/preset-env babel-loader');
+  }
+
+  if (promptAnswers.language === 'TS') {
+    await addEventListener('@babel/preset-typescript @babel/proposal-class-properties @babel/proposal-object-rest-spread');
+  }
+
+  if (promptAnswers.viewLibrary === 'react') {
+    await addNewPackage('@babel/preset-react babel-plugin-transform-react-remove-prop-types');
+    await addNewPackage('prop-types react react-dom', 'dev');
   }
 }
 
@@ -128,6 +166,7 @@ async function addScriptsAndBrowsersListConfig (promptAnswers) {
   jsonToAppend["browserslist"] = browserslist;
 
   Object.assign(packageJson, jsonToAppend);
+  console.log("inside addScriptsAndBrowsersListConfig() : ", jsonToAppend, packageJson);
   // writing to package JSON 
   await writePackage(packageJson);
 }

@@ -12,14 +12,11 @@ module.exports = merge(common, {
     path: path.join(__dirname, '../dist/js'),
    // publicPath: 'https://cdn.example.com/assets/[hash]/'
   },
-  plugins : [
-
-    <% if(webpack.includes('css')) {%>
-        new MiniCssExtractPlugin({
-            filename: "css/app.[contenthash].min.css",
-            allChunks: true
-        }),
-    <% } %>
+  plugins : [<% if(webpack.includes('css')) {%>
+    new MiniCssExtractPlugin({
+        filename: "css/app.[contenthash].min.css",
+        allChunks: true
+    }),<%}%>
     new webpack.HashedModuleIdsPlugin()
   ]
 });
