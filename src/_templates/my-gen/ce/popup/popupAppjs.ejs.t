@@ -1,10 +1,10 @@
 ---
 to : "<%= extensionModules.includes('popup') ? ( h.src() + '/' + srcDir + '/popup/popup.js' ) : null %>"
 ---
-import { APP_CONSTANTS } from 'appConstants';<% if (viewLibrary === 'react') {%>
+import { APP_CONSTANTS } from '../appConstants';<% if (viewLibrary === 'react') {%>
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import PopupContainer from './components/PopupContainer/PopupContainer';<%}%>
+import PopupContainer from './PopupContainer/PopupContainer';<%}%>
 
 console.log("inside popup script");
 startPopUpScript();

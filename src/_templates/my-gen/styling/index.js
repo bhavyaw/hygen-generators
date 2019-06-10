@@ -23,7 +23,7 @@ module.exports = {
     promptAnswers = await prompter.prompt([stylingRequirementsPrompt, cssModulesType]);
     console.log("webpack common requirements : ", JSON.stringify(promptAnswers, undefined, 4));
     // run required commoands
-    // await executeCommands(promptAnswers);
+    await executeCommands(promptAnswers);
 
     return promptAnswers;
   }
@@ -42,6 +42,6 @@ async function executeCommands(promptAnswers) {
   }
 
   if (promptAnswers.cssModules === 'babel') {
-    await addNewPackage('babel-plugin-react-css-modules babel-plugin-module-resolver postcss-scss postcss-nested postcss-import-sync2');
+    await addNewPackage('babel-plugin-react-css-module postcss-scss postcss-nested postcss-import-sync2');
   }
 }

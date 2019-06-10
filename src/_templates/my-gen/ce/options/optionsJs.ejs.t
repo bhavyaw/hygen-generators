@@ -1,10 +1,10 @@
 ---
-to : "<%= extensionModules.includes('popup') ? h.src() + '/' + srcDir + '/options/popup.js' : null %>"
+to : "<%= extensionModules.includes('options') ? ( h.src() + '/' + srcDir + '/options/options.js' ) : null %>"
 ---
-import { APP_CONSTANTS } from 'appConstants';<% if (viewLibrary === 'react') {%>
+import { APP_CONSTANTS } from '../appConstants';<% if (viewLibrary === 'react') {%>
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import OptionsContainer from './components/OptionsContainer/OptionsContainer';<%}%>
+import OptionsContainer from './OptionsContainer/OptionsContainer';<%}%>
 
 console.log('inside options script!');
 startPopUpScript();

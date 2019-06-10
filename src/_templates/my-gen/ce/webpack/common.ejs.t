@@ -3,53 +3,67 @@ to: "<%= h.src() %>/webpack/webpack.common.js"
 ---
 const path = require('path');
 const webpackGlobEntries = require('webpack-glob-entries');
-const srcDirectoryPath = path.resolve(process.cwd(), "<%= srcDir %>/**/*.{<%= language === 'JS' ? 'js,jsx' : 'ts,tsx' %>}");
+const srcDirectoryPath = path.join(process.cwd(), "<%= '/' + srcDir + '/**/*.{' + (language === 'js' ? 'js,jsx' : 'ts,tsx') + '}' %>");
 const originalEntriesHash = webpackGlobEntries(srcDirectoryPath);
+const webpack = require('webpack');
 // plugins 
 const CopyPlugin = require('copy-webpack-plugin');
-const { pick, values } = require('lodash');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
+const { pick } = require('lodash');
 // config files
 let mainChunks = pick(originalEntriesHash, [
-  'popup',
-  'options',
-  'appConfig',
+  '<%= extensionModules.includes('popup') ? "popup" : "" %>',
+  '<%= extensionModules.includes('options') ? "options" : "" %>',
+  '<%= extensionModules.includes('contentScripts') ? "contentScript1" : "" %>',
+  'appGlobals',
   'appMessages',
   'appConstants',
   // other files - add manually
 ]);
 
+/**
+ * Important Notes : 
+ * 
+ * 1. No need for bundle splitting and separate runtime chunk for / amongst background, popup, options and contentScripts Chunk
+ * as they are separate contexts and cannot share any code among them
+ * 
+ * 2. Only bundle splitting and code splitting related optimization can be done for content scripts which need to loaded on
+ * different urls
+ * 
+ *    2.1 Bundle splitting of shared npm packages
+ *    2.2 Code splitting ( or lazy loading ) of modules which can deferred or not initially required
+ */
+
 mainChunks[
   'background'
-] = "<%=h.src() + '/background/main.' + (language === 'JS' ? 'js' : 'ts' ) %>";
+] = "<%=h.src() + '/' + srcDir + '/background/main.' + language %>";
 
 console.log(`
-  Source Directory Path : ${srcDirectoryPath}
-  Main Chunks : ${mainChunks}
-`);
+Source Directory Path : ${srcDirectoryPath}
+Main Chunks : `, JSON.stringify(mainChunks, undefined, 4), 
+`Environment is : `, process.env.NODE_ENV
+);
 
-module.exports = function(env) {
-  const webpackConfig = {};
-  const rules = getRulesConfig(env);
+const isProduction = process.env.NODE_ENV === 'production';
 
-  Object.assign(webpackConfig, {
-      devtool : 'eval-source-map',
-      entry : mainChunks,
-      module : {
-        rules
-      },
-      resolve: {<% if (language === 'TS') {%>
-          extensions: ['.ts', '.tsx', '.js', 'json', 'scss', 'css'],<% } %><% if (language === 'JS') {%>
-          extensions: ['.js', '.jsx', 'json', 'scss', 'css'],<% } %>
-      },
-      optimization : getOptimizationConfig(env);
-  });
-  // plugins
-  const plugins = getPluginConfig(env);
-  Object.assign(webpackConfig, {plugins})
-  return webpackConfig;
-}
+module.exports = {
+    entry : mainChunks,
+    module : {
+      rules : getRulesConfig()
+    },
+    resolve: {<% if (language === 'ts') {%>
+        extensions: ['.ts', '.tsx', '.js', 'json', 'scss', 'css'],<% } %><% if (language === 'js') {%>
+        extensions: ['.js', '.jsx', 'json', 'scss', 'css'],<% } %>
+    },
+    plugins : [
+      ...getPluginConfig()
+    ],
+};
 
-function getRulesConfig(env) {
+
+function getRulesConfig() {
   const rules = [
     {
         test:/\.[jt]sx?$/,
@@ -70,90 +84,74 @@ function getRulesConfig(env) {
     <% if (webpack.includes('images')) { %>{
       test: /\.svg$/,
       use: "file-loader",
-    },<% } %>
-    <% if (webpack.includes('images')) { %>{
-        test: /\.(png|jpg|jpeg|gif)$/,
-        //exclude: path.resolve(__dirname, "../src/assets/images/source"),
-        use: [
-            {
-                loader: "url-loader",
-                options: {
-                    limit: 8192,
-                    name: "images/[path][name].[ext]?[hash]",
-                    //publicPath: ""
-                }
-            }
-        ]
+    },
+    {
+      test: /\.(png|jpg|jpeg|gif)$/,
+      //exclude: path.resolve(__dirname, "../src/assets/images/source"),
+      use: [
+          {
+              loader: "url-loader",
+              options: {
+                  limit: 8192,
+                  name: "images/[path][name].[ext]?[hash]",
+                  //publicPath: ""
+              }
+          }
+      ]
     },<% } %>
     <% if (webpack.includes('fonts')) { %>{
-        test: /\.(woff|woff2|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
-        use: {
-            loader: "url-loader",
-            options: {
-                limit: 8192,
-                name: "fonts/[name].[ext]?[hash]"
-                // publicPath: "../", // Take the directory into account
-            }
-        }
-    }<% } %>
+      test: /\.(woff|woff2|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
+      use: {
+          loader: "url-loader",
+          options: {
+              limit: 8192,
+              name: "fonts/[name].[ext]?[hash]"
+              // publicPath: "../", // Take the directory into account
+          }
+      }
+    },<% } %>
+    {
+        test: /.html$/,
+        loader: 'html-loader'
+    }
   ];
 
   return rules;
 }
 
-function getPluginConfig(env) {
+function getPluginConfig() {
   const plugins = [
       new webpack.ProgressPlugin(),
       new CleanWebpackPlugin(),
       new CopyPlugin([
-          { from: path.join(__dirname, '../<%= srcDir %>/assets') , to: path.join(__dirname, '../dist/assets' },
+          { from: path.join(__dirname, '../<%= srcDir %>/assets') , to: path.join(__dirname, '../dist/assets') },
       ]), 
+        new CopyPlugin([
+        { from: path.join(__dirname, '../<%= srcDir %>/manifest.json') , to: path.join(__dirname, '../dist/') },
+      ]),<% if (extensionModules.includes('popup')) { %>
       new HtmlWebpackPlugin({
-        inject: false,
-        chunks: ['popup'],
+        inject: true,
+        chunks: ['popup', 'runtime'],
         filename: path.join(__dirname, '../dist/popup.html'),
-        template : path.join(__dirname, '../src/popup/popup.html')
-        minify : getHtmlMinificationConfig(env.production),
-      }),
+        template : path.join(__dirname, '../src/popup/popup.html'),
+        minify : getHtmlMinificationConfig(isProduction),
+        chunksSortMode : 'manual'
+      }),<%}%>
+      <% if (extensionModules.includes('options')) { %>
       new HtmlWebpackPlugin({
-        inject: false,
-        chunks: ['options'],
+        inject: true,
+        chunks: ['options', 'runtime'],
         filename: path.join(__dirname, '../dist/options.html'),
-        template : path.join(__dirname, '../src/options/options.html')
-        minify : getHtmlMinificationConfig(env.production),
-      })
+        template : path.join(__dirname, '../src/options/options.html'),
+        minify : getHtmlMinificationConfig(isProduction),
+        chunksSortMode : 'manual'
+      })<%}%>
   ];
 
-  if (env.analyzeBundle) {
+  if (process.env.analyzeBundle) {
     plugins.push(new BundleAnalyzerPlugin());
   }
   return plugins;
-}
-
-function getOptimizationConfig(env) {
-  const optimization = {
-    runtimeChunk: 'single',
-    splitChunks: {
-       chunks: 'all',
-       maxInitialRequests: Infinity,
-       minSize: 0,
-        cacheGroups: {
-            vendor : {
-                test: /[\\/]node_modules[\\/]/,
-                name(module) {
-                  // get the name. E.g. node_modules/packageName/not/this/part.js
-                  // or node_modules/packageName
-                  const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
-
-                  // npm package names are URL-safe, but some servers don't like @ symbols
-                  return `npm.${packageName.replace('@', '')}`;
-                }
-            }
-        }
-    }
-  };
-
-  return optimization;
 }
 
 function getHtmlMinificationConfig(production) {

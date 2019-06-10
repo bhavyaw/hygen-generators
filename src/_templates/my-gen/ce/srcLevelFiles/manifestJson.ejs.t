@@ -20,7 +20,7 @@ to : "<%= h.src()%>/<%= srcDir %>/manifest.json"
     "content_scripts": [
         {
             "matches": [
-               
+                "*://*/*"
             ],
             "js": [
                 "./js/contentScript1.js"
@@ -29,7 +29,6 @@ to : "<%= h.src()%>/<%= srcDir %>/manifest.json"
     ],<%}%>
     "background": {
         "scripts": [
-            "js/vendor.js",
             "js/background.js"
         ],
         "persistent": <%=extensionModules.includes('persistentBackground') ? true : false %>

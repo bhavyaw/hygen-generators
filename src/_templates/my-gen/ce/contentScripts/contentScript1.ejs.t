@@ -1,8 +1,8 @@
 ---
 to : "<%= extensionModules.includes('contentScripts') ? ( h.src() + '/' + srcDir + '/contentScripts/contentScript1.js' ) : null %>"
 ---
-import { APP_CONSTANTS } from 'appConstants';
-import { APP_MESSAGES } from 'appMessages';
+import { APP_CONSTANTS } from '../appConstants';
+import { APP_MESSAGES } from '../appMessages';
 
 console.log(`Inside content Script file - contentScript1.js`);
 startContentScript();

@@ -2,13 +2,9 @@
 inject: true
 to: "<%= h.src() %>/.babelrc.js"
 after: plugins\s*\:\s*\[
-skip_if: "module-resolver"
+skip_if: "react-css-modules"
 ---
 <% if (cssModule === 'babel') { %>
-    ["module-resolver", {
-      "alias": {},
-      "extensions": [".js", ".jsx", ".scss", ".css", ".json"]
-    }],
     ["react-css-modules", {
       "webpackHotModuleReloading": true,
       "filetypes": {
@@ -16,12 +12,12 @@ skip_if: "module-resolver"
           "filetypes": {
             ".module.scss": {
                 "syntax": "postcss-scss",
-                plugins : [
-                  ["postcss-import-sync2", {
-                    "path": ["src/assets/styles"]
-                  }],
-                  "postcss-nested"
-                ]
+                 "plugins" : [
+                    ["postcss-import-sync2", {
+                      "path": ["src/assets/styles"]
+                    }],
+                    "postcss-nested"
+                  ]
             }
         }
       }

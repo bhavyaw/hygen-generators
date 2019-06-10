@@ -12,5 +12,6 @@ to : "<%= extensionModules.includes('options') ? ( h.src() + '/' + srcDir + '/op
 
 <body>
   <div id="options-container"></div>
+  <b>Sample options page</b>
 </body>
 </html>

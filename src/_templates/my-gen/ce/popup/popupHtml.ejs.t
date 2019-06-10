@@ -9,5 +9,6 @@ to : "<%= extensionModules.includes('popup') ? ( h.src() + '/' + srcDir + '/popu
 
     <body class="overflow-hidden h-100">
         <div id="pop-up-container" class="pop-up-container"></div>
+        <b>Sample popup page</b>
     </body>
 </html>

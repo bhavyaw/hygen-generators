@@ -4,7 +4,6 @@ const isEmpty = require("lodash/isEmpty");
 const readPkg = require('read-pkg');
 const hygenConfig = require(process.cwd() + '/.hygen.js');
 
-
 // TODO : use better option than process.cwd()
 // const packageJsonPath = path.join(process.cwd(), "/package.json");
 // const packageJson = awaitrequire(packageJsonPath);
@@ -49,12 +48,10 @@ async function addNewPackage(packageName = "", dependencyType = "dev", packageMa
     const package = packages[i];
     const isPackageInstalled = get(packageJson, [ dependencyType, package]);
 
-    console.log("inside addNewPackage : ", isPackageInstalled, package);
-  
     if (isPackageInstalled) {
-      console.log(`${packageName} is already installed.....skipping installation`);
+      console.log(`${package} is already installed.....skipping installation`);
     } else {
-      await shellExecAsync(`yarn add ${dependencyType ? "-D" : ""} ${package} `, {}, true);
+      await shellExecAsync(`yarn add --silent ${dependencyType ? "-D" : ""} ${package} `, {}, true);
     }
   }
 }

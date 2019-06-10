@@ -1,5 +1,5 @@
 ---
-to: "<%= h.src() %>/<%= srcDir %>/appConstants.js"
+to: "<%= h.src() + '/' + srcDir + '/appConstants.js' %>"
 ---
 export const APP_CONSTANTS = {
     DAY_IN_MS: 86400000

@@ -1,9 +1,10 @@
 ---
 to: "<%= h.src() %>/<%= srcDir %>/background/main.js"
 ---
-import { APP_CONSTANTS } from 'appConstants';
-import { APP_MESSAGES } from 'appMessages';
+import { APP_CONSTANTS } from '../appConstants';
+import { APP_MESSAGES } from '../appMessages';
 
+console.log(`Inside background scripts...`);
 initializeBackgroundScript();
 
 async function initializeBackgroundScript() {
@@ -18,7 +19,6 @@ async function initializeBackgroundScript() {
 
 function handleBrowserStartEvent() {
   // showDesktopNotification(`Browser has started!!!`);
-  intiateRefreshCycle();
   listenToTabEvents();
   // extension message handler
 }

@@ -1,5 +1,5 @@
 ---
-to : "<%= h.src() %>/<%= srcDir %>/appGlobals.js"
+to : "<%=extensionModules.includes('contentScripts') ? (  h.src() + '/' + srcDir + '/appGlobals.js' ) : null %>"
 ---
 /**
  *  For non-persistent data sharing b/w various content script modules

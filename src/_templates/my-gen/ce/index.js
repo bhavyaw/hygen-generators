@@ -16,8 +16,8 @@ module.exports = {
       name : 'language',
       message : 'Please select the Project Type',
       choices : [
-        {name : 'JS', message : 'JavaScript', value : true},
-        {name : 'TS', message : 'Typescript', value : true}
+        {name : 'js', message : 'JavaScript', value : true},
+        {name : 'ts', message : 'Typescript', value : true}
       ]
     };
 
@@ -36,9 +36,9 @@ module.exports = {
     const srcDirPathPrompt = {
       type : 'input',
       name: 'srcDir',
-      message: '\nPlease Enter your source directory path \n',
-      hint : "For eg : '../'   |   '../../'   |    './src/",
-      initial : './src'
+      message: '\nPlease Enter your source directory path. \nNote : Just the name or path from project root. No delimiters in the beginning or end... \n',
+      hint : 'For eg : src, codebase etc',
+      initial : 'src'
     };
 
     const extensionModules = {
@@ -75,21 +75,41 @@ module.exports = {
   
     promptAnswers = await prompter.prompt(initialPrompts);
     // const absoluteSrcDirectoryPath = path.resolve(promptAnswers.srcDir);
-    
+  
     Object.assign(promptAnswers, {
-      appName : packageJson.name,
-      description : packageJson.description,
-      appVersion : packageJson.version
+      appName : packageJson.name || "",
+      description : packageJson.description || "",
+      appVersion : packageJson.version || ""
       // src : absoluteSrcDirectoryPath
     });
     console.log(`Prompt Answers for chrome extension generator are : `, promptAnswers);
+    await addConfigToPackageJson(promptAnswers);
     await executeCommands(promptAnswers);
-    await addScriptsAndBrowsersListConfig(promptAnswers);
     return promptAnswers;
   }
 };
 
+async function addConfigToPackageJson (promptAnswers) {
+  console.log("Webpack generator : Writing to package.json file!!!");
+  const jsonToAppend = {};
+  const browserslist = {
+    "development": [
+      "last 10 Chrome versions"
+    ],
+    "production": [
+      "last 20 Chrome versions"
+    ]
+  };
+  jsonToAppend["scripts"] = get(packageScripts, "webpack");
+  jsonToAppend["browserslist"] = browserslist;
+  Object.assign(packageJson, jsonToAppend);
+  // console.log("inside addConfigToPackageJson() : ", jsonToAppend);
+  // writing to package JSON 
+  await writePackage(packageJson);
+}
 
+// @priority high
+//TODO - instead of this create separate package.json and just run yarn command - more customizable
 async function executeCommands(promptAnswers) {
   const assetsPath = path.join(promptAnswers.srcDir, 'assets');
   console.log(`Assets Path is  : `, assetsPath);
@@ -101,18 +121,16 @@ async function executeCommands(promptAnswers) {
     path.normalize(promptAnswers.srcDir + '/assets')
   );
   // npm packages
-  await addNodePackages();
-
-  if (promptAnswers.viewLibrary.react) {
-    await addNewPackage('react react-dom'); 
-  }
+  await addNodePackages(promptAnswers);
 }
 
-async function addNodePackages() {
+// @priority medium
+//TODO - it would be much better to create a package json template or injection of dependencies and call yarn post that
+async function addNodePackages(promptAnswers) {
   // webpack core
-  await addNewPackage('webpack webpack-cli webpack-dev-server webpack-merge write-pkg cross-env');
+  await addNewPackage('webpack webpack-cli webpack-dev-server webpack-merge cross-env webpack-glob-entries');
   // webpack plugins
-  await addNewPackage('webpack-copy-plugin clean-webpack-plugin webpack-bundle-analyzer html-webpack-plugin');
+  await addNewPackage('clean-webpack-plugin webpack-bundle-analyzer html-webpack-plugin copy-webpack-plugin html-loader');
 
   if (promptAnswers.webpack.includes('CSS')) {
     await addNewPackage('css-loader');
@@ -130,11 +148,13 @@ async function addNodePackages() {
   }
 
   // babel loaders
-  if (promptAnswers.language === 'JS') {
-    await addNewPackage('@babel/core @babel/preset-env babel-loader');
+  if (promptAnswers.language === 'js') {
+    await addNewPackage('@babel/core @babel/preset-env babel-loader @babel/runtime');
+    // babel plugins
+    await addNewPackage('@babel/plugin-transform-runtime babel-plugin-module-resolver');
   }
 
-  if (promptAnswers.language === 'TS') {
+  if (promptAnswers.language === 'ts') {
     await addEventListener('@babel/preset-typescript @babel/proposal-class-properties @babel/proposal-object-rest-spread');
   }
 
@@ -142,31 +162,4 @@ async function addNodePackages() {
     await addNewPackage('@babel/preset-react babel-plugin-transform-react-remove-prop-types');
     await addNewPackage('prop-types react react-dom', 'dev');
   }
-}
-
-async function addScriptsAndBrowsersListConfig (promptAnswers) {
-  console.log("Webpack generator : Writing to package.json file!!!");
-  const jsonToAppend = {};
-  
-  const browserslist = {
-      "development": [
-        "last 2 chrome versions",
-        "last 2 firefox versions",
-        "last 2 edge versions"
-      ],
-      "production": [
-        ">1%",
-        "last 4 versions",
-        "Firefox ESR",
-        "not ie < 11"
-      ]
-  };
-
-  jsonToAppend["scripts"] = get(packageJson, "webpack");
-  jsonToAppend["browserslist"] = browserslist;
-
-  Object.assign(packageJson, jsonToAppend);
-  console.log("inside addScriptsAndBrowsersListConfig() : ", jsonToAppend, packageJson);
-  // writing to package JSON 
-  await writePackage(packageJson);
 }
