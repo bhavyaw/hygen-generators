@@ -19,6 +19,7 @@ module.exports = {
     plugins: [
         ["module-resolver", {
             "alias": {
+                "@" : "<%='./' + srcDir %>",
                 "appConstants" : "<%='./' + srcDir + '/appConstants.' + language %>",
                 "appMessages" : "<%='./' + srcDir + '/appMessages.' + language %>",
                 "appGlobals" : "<%='./' + srcDir + '/appGlobals.' + language %>",
@@ -33,7 +34,8 @@ module.exports = {
         }],
         "@babel/plugin-transform-runtime",<% if(language === 'ts') {%>
         "@babel/proposal-class-properties",
-        "@babel/proposal-object-rest-spread"<% } %>
+        "@babel/proposal-object-rest-spread"<%}%>
+        "babel-plugin-lodash"
     ],
     env: {
         "production": {

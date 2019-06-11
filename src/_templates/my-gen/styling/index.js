@@ -30,18 +30,19 @@ module.exports = {
 }
 
 async function executeCommands(promptAnswers) {
+  console.log('inside executeCommands() for styling generator');
   if (promptAnswers.sass) {
     await addNewPackage("sass-loader");
     await addNewPackage("node-sass");
   }
 
-  if (promptAnswers.cssModules) {
+  if (promptAnswers.cssModule === 'normal') {
     await addNewPackage("sass-loader");
     await addNewPackage("css-loader");
     await addNewPackage("style-loader");
   }
 
-  if (promptAnswers.cssModules === 'babel') {
-    await addNewPackage('babel-plugin-react-css-module postcss-scss postcss-nested postcss-import-sync2');
+  if (promptAnswers.cssModule === 'babel') {
+    await addNewPackage('babel-plugin-react-css-modules postcss-scss postcss-nested postcss-import-sync2');
   }
 }

@@ -10,6 +10,7 @@ const webpack = require('webpack');
 const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 const { pick } = require('lodash');
 // config files
@@ -40,13 +41,13 @@ mainChunks[
   'background'
 ] = "<%=h.src() + '/' + srcDir + '/background/main.' + language %>";
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 console.log(`
 Source Directory Path : ${srcDirectoryPath}
 Main Chunks : `, JSON.stringify(mainChunks, undefined, 4), 
-`Environment is : `, process.env.NODE_ENV
+`Is Production environment : `, isProduction
 );
-
-const isProduction = process.env.NODE_ENV === 'production';
 
 module.exports = {
     entry : mainChunks,
@@ -59,7 +60,7 @@ module.exports = {
     },
     plugins : [
       ...getPluginConfig()
-    ],
+    ]
 };
 
 
@@ -110,10 +111,6 @@ function getRulesConfig() {
           }
       }
     },<% } %>
-    {
-        test: /.html$/,
-        loader: 'html-loader'
-    }
   ];
 
   return rules;
@@ -134,7 +131,7 @@ function getPluginConfig() {
         chunks: ['popup', 'runtime'],
         filename: path.join(__dirname, '../dist/popup.html'),
         template : path.join(__dirname, '../src/popup/popup.html'),
-        minify : getHtmlMinificationConfig(isProduction),
+        minify : getHtmlMinificationConfig(),
         chunksSortMode : 'manual'
       }),<%}%>
       <% if (extensionModules.includes('options')) { %>
@@ -143,9 +140,12 @@ function getPluginConfig() {
         chunks: ['options', 'runtime'],
         filename: path.join(__dirname, '../dist/options.html'),
         template : path.join(__dirname, '../src/options/options.html'),
-        minify : getHtmlMinificationConfig(isProduction),
+        minify : getHtmlMinificationConfig(),
         chunksSortMode : 'manual'
-      })<%}%>
+      }),<%}%>
+      new LodashModuleReplacementPlugin({
+        'array': true,
+      })
   ];
 
   if (process.env.analyzeBundle) {
@@ -154,10 +154,9 @@ function getPluginConfig() {
   return plugins;
 }
 
-function getHtmlMinificationConfig(production) {
-  return  production
+function getHtmlMinificationConfig() {
+  return  isProduction
     ? {
-        minify: {
           removeComments: true,
           collapseWhitespace: true,
           removeRedundantAttributes: true,
@@ -168,7 +167,6 @@ function getHtmlMinificationConfig(production) {
           minifyJS: true,
           minifyCSS: true,
           minifyURLs: true,
-        },
       }
     : undefined;
 }

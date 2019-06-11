@@ -102,6 +102,8 @@ async function addConfigToPackageJson (promptAnswers) {
   };
   jsonToAppend["scripts"] = get(packageScripts, "webpack");
   jsonToAppend["browserslist"] = browserslist;
+  // to enable tree shaking
+  jsonToAppend["sideEffects"] = false;
   Object.assign(packageJson, jsonToAppend);
   // console.log("inside addConfigToPackageJson() : ", jsonToAppend);
   // writing to package JSON 
@@ -130,7 +132,14 @@ async function addNodePackages(promptAnswers) {
   // webpack core
   await addNewPackage('webpack webpack-cli webpack-dev-server webpack-merge cross-env webpack-glob-entries');
   // webpack plugins
-  await addNewPackage('clean-webpack-plugin webpack-bundle-analyzer html-webpack-plugin copy-webpack-plugin html-loader');
+  await addNewPackage(`
+    clean-webpack-plugin 
+    webpack-bundle-analyzer 
+    html-webpack-plugin 
+    copy-webpack-plugin 
+    lodash-webpack-plugin 
+    terser-webpack-plugin
+  `);
 
   if (promptAnswers.webpack.includes('CSS')) {
     await addNewPackage('css-loader');
@@ -149,9 +158,9 @@ async function addNodePackages(promptAnswers) {
 
   // babel loaders
   if (promptAnswers.language === 'js') {
-    await addNewPackage('@babel/core @babel/preset-env babel-loader @babel/runtime');
+    await addNewPackage('@babel/core @babel/cli @babel/preset-env babel-loader @babel/runtime');
     // babel plugins
-    await addNewPackage('@babel/plugin-transform-runtime babel-plugin-module-resolver');
+    await addNewPackage('@babel/plugin-transform-runtime babel-plugin-module-resolver babel-plugin-lodash');
   }
 
   if (promptAnswers.language === 'ts') {
@@ -160,6 +169,6 @@ async function addNodePackages(promptAnswers) {
 
   if (promptAnswers.viewLibrary === 'react') {
     await addNewPackage('@babel/preset-react babel-plugin-transform-react-remove-prop-types');
-    await addNewPackage('prop-types react react-dom', 'dev');
+    await addNewPackage('prop-types react react-dom', false);
   }
 }

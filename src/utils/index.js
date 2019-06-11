@@ -30,7 +30,7 @@ module.exports = {
  * @param {*} dependencyType {string} - "dev" | "normal"
  * @param {*} packageManager 
  */
-async function addNewPackage(packageName = "", dependencyType = "dev", packageManager = "yarn") {
+async function addNewPackage(packageName = "", isDevDependency = true, packageManager = "yarn") {
   packageName = packageName.split(/\s+/).filter(i => i.length);
   let packages = [];
   if (isEmpty(packageName)) {
@@ -43,7 +43,8 @@ async function addNewPackage(packageName = "", dependencyType = "dev", packageMa
     packages = [packageName];
   }
 
-  dependencyType = dependencyType === "dev" ? "devDependencies" : "dependencies";
+  const dependencyType = isDevDependency ? "devDependencies" : "dependencies";
+  
   for (let i = 0; i < packages.length; i++) {
     const package = packages[i];
     const isPackageInstalled = get(packageJson, [ dependencyType, package]);
@@ -51,7 +52,7 @@ async function addNewPackage(packageName = "", dependencyType = "dev", packageMa
     if (isPackageInstalled) {
       console.log(`${package} is already installed.....skipping installation`);
     } else {
-      await shellExecAsync(`yarn add --silent ${dependencyType ? "-D" : ""} ${package} `, {}, true);
+      await shellExecAsync(`yarn add --silent ${isDevDependency ? "-D" : ""} ${package} `, {}, true);
     }
   }
 }
