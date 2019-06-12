@@ -130,7 +130,7 @@ async function executeCommands(promptAnswers) {
 //TODO - it would be much better to create a package json template or injection of dependencies and call yarn post that
 async function addNodePackages(promptAnswers) {
   // webpack core
-  await addNewPackage('webpack webpack-cli webpack-dev-server webpack-merge cross-env webpack-glob-entries');
+  await addNewPackage('webpack webpack-cli webpack-dev-server webpack-merge cross-env webpack-glob-entries mini-css-extract-plugin');
   // webpack plugins
   await addNewPackage(`
     clean-webpack-plugin 

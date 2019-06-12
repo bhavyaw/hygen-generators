@@ -25,6 +25,7 @@ module.exports = merge(common, {
           module : true,
           toplevel : true,
           keep_classnames  : false,
+          comments: false,
           compress: {
             warnings: true,
             // drop_console: true,

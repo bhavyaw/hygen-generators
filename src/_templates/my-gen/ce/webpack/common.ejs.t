@@ -82,6 +82,7 @@ function getRulesConfig() {
           }
         ]
     },<% } %>
+    // sass-injection-hook
     <% if (webpack.includes('images')) { %>{
       test: /\.svg$/,
       use: "file-loader",
