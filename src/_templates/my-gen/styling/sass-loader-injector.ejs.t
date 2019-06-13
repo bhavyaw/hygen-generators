@@ -4,7 +4,7 @@ to: "<%= h.src() %>/webpack/webpack.common.js"
 after: sass-injection-hook
 skip_if: sass-loader
 ---
-<% if (sass) { %>{
+  <% if (sass) { %>{
       test: /\.scss$/,
       exclude: /\.module\.scss$/,
       use: [
@@ -18,7 +18,7 @@ skip_if: sass-loader
         },
         'sass-loader'
       ]
-    },<% } %><% if (typeof cssModule !== undefined) { %>
+    },<%}%><% if (typeof cssModule !== undefined) { %>
     {
     exclude: /node_modules/, 
     test: /\.module\.scss$/,

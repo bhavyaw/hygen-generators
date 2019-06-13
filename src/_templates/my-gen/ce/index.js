@@ -65,12 +65,31 @@ module.exports = {
       ]
     };
 
+    const stylingRequirementsPrompt = {
+      type : "confirm",
+      name : "sass",
+      message : "Do you want to use sass preprocessor for styling ?",
+    };
+
+    const cssModulesType = {
+      type : 'select',
+      name : 'cssModule',
+      message : 'Select the css module type',
+      choices : [
+        { name : 'normal', message : 'Normal CSS Modules'},
+        { name : 'babel', message : 'Babel Plugin react css modules'}
+      ]
+    };
+
+  
     const initialPrompts = [
       languageUsedPrompt, 
       viewLibrary,
       srcDirPathPrompt, 
       extensionModules,
-      webpackRequirements
+      webpackRequirements,
+      stylingRequirementsPrompt,
+      cssModulesType
     ];
   
     promptAnswers = await prompter.prompt(initialPrompts);
@@ -170,5 +189,23 @@ async function addNodePackages(promptAnswers) {
   if (promptAnswers.viewLibrary === 'react') {
     await addNewPackage('@babel/preset-react babel-plugin-transform-react-remove-prop-types');
     await addNewPackage('prop-types react react-dom', false);
+  }
+
+  console.log('inside executeCommands() for styling generator');
+  if (promptAnswers.sass) {
+    await addNewPackage("sass-loader");
+    await addNewPackage("node-sass");
+  }
+
+  if (promptAnswers.cssModule === 'normal') {
+    await addNewPackage("sass-loader");
+    await addNewPackage("css-loader");
+    await addNewPackage("style-loader");
+  }
+
+  if (promptAnswers.cssModule === 'babel' && promptAnswers.viewLibrary === 'react') {
+    await addNewPackage('babel-plugin-react-css-modules postcss-scss postcss-nested postcss-import-sync2');
+  } else if (promptAnswers.viewLibrary !== 'react') {
+    console.error(`Babel react css modules work only with react...use normal css modules otherwise`);
   }
 }
