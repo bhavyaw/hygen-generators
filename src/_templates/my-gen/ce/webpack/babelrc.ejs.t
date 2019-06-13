@@ -16,7 +16,27 @@ module.exports = {
         }]<% } %><% if(language === 'ts') {%>
         "@babel/preset-typescript"<% } %>
     ],
-    plugins: [
+    plugins: [<% if(cssModule === 'babel' && viewLibrary === 'react') {%>
+        [
+            'babel-plugin-react-css-modules',
+            {
+                context: context,
+                generateScopedName: generateClassNames,
+                filetypes: {
+                '.scss': {
+                    syntax: 'postcss-scss',
+                    plugins: [
+                    ['postcss-import-sync2', { resolve: postCssImportResolver }],
+                    'postcss-nested'
+                    ]
+                }
+                },
+                exclude: 'node_modules',
+                webpackHotModuleReloading: true,
+                handleMissingStyleName: 'warn',
+                autoResolveMultipleImports: true
+            }
+        ],<%}%>
         ["module-resolver", {
             "alias": {
                 "@" : "<%='./' + srcDir %>",
@@ -44,4 +64,27 @@ module.exports = {
             ]
         }
     }
+}
+
+function postCssImportResolver(id, basedir, importOptions) {
+  let nextId = id;
+
+  if (id.substr(0, 2) === './') {
+    nextId = id.replace('./', '');
+  }
+
+  if (nextId[0] !== '_') {
+    nextId = `_${nextId}`;
+  }
+
+  if (nextId.indexOf('.scss') === -1) {
+    nextId = `${nextId}.scss`;
+  }
+
+  return path.resolve(basedir, nextId);
+}
+
+function generateClassNames(localName, resourcePath) {
+  const fileName = path.basename(resourcePath, '.scss');
+  return `${fileName}__${localName}`;
 }

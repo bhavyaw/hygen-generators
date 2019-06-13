@@ -42,7 +42,9 @@ async function executeCommands(promptAnswers) {
     await addNewPackage("style-loader");
   }
 
-  if (promptAnswers.cssModule === 'babel') {
+  if (promptAnswers.cssModule === 'babel' && viewLibrary === 'react') {
     await addNewPackage('babel-plugin-react-css-modules postcss-scss postcss-nested postcss-import-sync2');
+  } else if (viewLibrary !== 'react') {
+    console.error(`Babel react css modules work only with react...use normal css modules otherwise`);
   }
 }
