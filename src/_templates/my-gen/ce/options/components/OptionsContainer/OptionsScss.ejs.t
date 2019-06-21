@@ -1,5 +1,5 @@
 ---
-to : "<%= viewLibrary === 'react' && extensionModules.includes('popup') ? ( h.src() + '/' + srcDir + '/popup/PopupContainer/Popup' + (sass ? '.scss' : '.css') ) : null %>"
+to : "<%= viewLibrary === 'react' && extensionModules.includes('options') ? ( h.src() + '/' + srcDir + '/options/OptionsContainer/Options' + (sass ? '.scss' : '.css') ) : null %>"
 ---
 /*@import '../../../assets//styles/bootstrap/config';
 @import '../../../assets//styles/bootstrap/bootstrap-ext';*/
@@ -13,7 +13,6 @@ html {
 
 body {
   overflow: hidden;
-  background : url (../../assets/images/papyrus.png);
 }
 
 .cursor-pointer {
@@ -22,4 +21,10 @@ body {
 
 .cursor-na {
   cursor: not-allowed;
+}
+
+input[disabled],
+select[disabled],
+button[disabled] {
+  @extend .cursor-na;
 }

@@ -1,5 +1,5 @@
 ---
-to : "<%= viewLibrary === 'react' && extensionModules.includes('options') ? ( h.src() + '/' + srcDir + '/options/OptionsContainer/OptionsContainer.module.scss') : null %>"
+to : "<%= viewLibrary === 'react' && extensionModules.includes('options') && (cssModule !== 'none') ? ( h.src() + '/' + srcDir + '/options/OptionsContainer/OptionsContainer.module' + (sass ? '.scss' : '.css')) : null %>"
 ---
 .options-wrapper {
   font-size: 0.9rem;

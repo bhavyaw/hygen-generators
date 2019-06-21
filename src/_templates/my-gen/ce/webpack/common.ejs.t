@@ -78,10 +78,13 @@ function getRulesConfig() {
             loader: 'style-loader' // Creates style nodes from JS strings
           },
           {
-            loader: 'css-loader' // Translates CSS into CommonJS
+            loader: 'css-loader', // Translates CSS into CommonJS
+            options : {
+              url : false
+            }
           }
         ]
-    },,<% } %>
+    },<% } %>
     <% if (sass) { %>{
       test: /\.scss$/,
       exclude: /\.module\.scss$/,
@@ -91,12 +94,21 @@ function getRulesConfig() {
           loader: 'css-loader',
           options: {
             modules: false,
-            sourceMap: true
+            url : false,
+            importLoaders : 2
           }
         },
-        'sass-loader'
+        'resolve-url-loader',
+        {
+          loader : 'sass-loader',
+          options : {
+            outputStyle: 'expanded',
+            sourceMap: true,
+            sourceMapContents: true
+          }
+        },
       ]
-    },<%}%><% if (typeof cssModule !== undefined) { %>
+    },<%}%><% if (cssModule !== 'none') { %>
     {
       exclude: /node_modules/, 
       test: /\.module\.scss$/,
@@ -105,15 +117,17 @@ function getRulesConfig() {
         {
             loader: 'css-loader', // Translates CSS into CommonJS
             options: {
-              importLoaders: 1,
+              importLoaders: <%= sass ? 2 : 0 %>,
               modules: {
                 localIdentName: '[name]__[local]',
                 context : path.resolve(__dirname, '../src')
               },
               sourceMap: true,
-              localsConvention: 'camelCase'
+              localsConvention: 'camelCase',
+              url : false
             }
         },<% if (sass) { %>
+        'resolve-url-loader',
         {
           loader : 'sass-loader',
           options: {
@@ -129,14 +143,14 @@ function getRulesConfig() {
       use: "file-loader",
     },
     {
-      test: /\.(png|jpg|jpeg|gif)$/,
+      test: /\.(png|jpe?g|gif)$/,
       //exclude: path.resolve(__dirname, "../src/assets/images/source"),
       use: [
           {
               loader: "url-loader",
               options: {
                   limit: 8192,
-                  name: "images/[path][name].[ext]?[hash]",
+                  name: "name].[ext]",
                   //publicPath: ""
               }
           }

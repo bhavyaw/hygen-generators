@@ -76,6 +76,7 @@ module.exports = {
       name : 'cssModule',
       message : 'Select the css module type',
       choices : [
+        {name : 'none', message : 'No CSS Modules'},
         { name : 'normal', message : 'Normal CSS Modules'},
         { name : 'babel', message : 'Babel Plugin react css modules'}
       ]
@@ -138,8 +139,8 @@ async function executeCommands(promptAnswers) {
   await makeDir(assetsPath);
   // copy assets
   await copyFiles(
-    hygenConfig.templates + '/my-gen/ce/assets/*',
-    path.normalize(promptAnswers.srcDir + '/assets')
+    path.normalize(hygenConfig.templates + '/my-gen/ce/assets'),
+    path.normalize(path.resolve(promptAnswers.srcDir))
   );
   // npm packages
   await addNodePackages(promptAnswers);
@@ -193,7 +194,7 @@ async function addNodePackages(promptAnswers) {
 
   console.log('inside executeCommands() for styling generator');
   if (promptAnswers.sass) {
-    await addNewPackage("sass-loader");
+    await addNewPackage("sass-loader resolve-url-loader");
     await addNewPackage("node-sass");
   }
 

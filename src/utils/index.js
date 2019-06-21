@@ -57,8 +57,8 @@ async function addNewPackage(packageName = "", isDevDependency = true, packageMa
   }
 }
 
-async function copyFiles(copyFrom, copyTo) {
-  const copyCommand = `cp ${copyFrom} ${copyTo}`;
+async function copyFiles(copyFrom, copyTo, recursive = true) {
+  const copyCommand = `cp ${recursive ? "-R" : ""} ${copyFrom} ${copyTo}`;
   console.log(`Inside copyFiles : `, copyCommand);
   await shellExecAsync(copyCommand, {}, true);
 }

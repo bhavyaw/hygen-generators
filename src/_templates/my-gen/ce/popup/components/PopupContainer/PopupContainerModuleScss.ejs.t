@@ -1,6 +1,6 @@
 ---
-to : "<%= viewLibrary === 'react' && extensionModules.includes('popup') ? ( h.src() + '/' + srcDir + '/popup/PopupContainer/PopupContainer.module.scss') : null %>"
+to : "<%= viewLibrary === 'react' && extensionModules.includes('popup') && (cssModule !== 'none') ? ( h.src() + '/' + srcDir + '/popup/PopupContainer/PopupContainer.module' + (sass ? '.scss' : '.css')) : null %>"
 ---
 .pop-up {
-  background: green;
+  background: url (../../assets/icon16.png);
 }
