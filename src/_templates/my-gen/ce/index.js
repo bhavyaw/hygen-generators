@@ -11,6 +11,12 @@ module.exports = {
     let promptAnswers =  {};
 
     // common to all generators
+    const hygenConfigPrompt = {
+      type : 'confirm',
+      name : 'hygenConfig',
+      message : 'Do you want to add Hygen config',
+    };
+    
     const languageUsedPrompt = {
       type : 'select',
       name : 'language',
@@ -84,6 +90,7 @@ module.exports = {
 
   
     const initialPrompts = [
+      hygenConfigPrompt,
       languageUsedPrompt, 
       viewLibrary,
       srcDirPathPrompt, 
