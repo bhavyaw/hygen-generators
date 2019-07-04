@@ -5,6 +5,7 @@ const webpack = require('webpack');
 const merge = require("webpack-merge");
 const common = require("./webpack.common.js");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const path = require('path');
 
@@ -14,7 +15,7 @@ module.exports = merge(common, {
   output : {
     filename: '[name].js',
     path: path.join(__dirname, '../dist/js'),
-   // publicPath: 'https://cdn.example.com/assets/[hash]/'
+    publicPath: 'js/'
   },
    optimization: {
     minimizer: [
@@ -34,16 +35,27 @@ module.exports = merge(common, {
             toplevel : true
           }
         }
+      }),
+      new OptimizeCssAssetsPlugin({
+        cssProcessorPluginOptions: {
+          preset: ['default', { discardComments: { removeAll: true } }],
+        },
+        canPrint: true
       })
     ]
   },
   plugins : [
     // Avoid publishing files when compilation fails
     new webpack.NoEmitOnErrorsPlugin(), 
-    new webpack.HashedModuleIdsPlugin(),<% if(webpack.includes('css')) {%>
+    new webpack.HashedModuleIdsPlugin(),
+     new webpack.DefinePlugin({
+      "process.env": { 
+         NODE_ENV: JSON.stringify("production") 
+       }
+    }),<% if(webpack.includes('css')) {%>
     new MiniCssExtractPlugin({
-        filename: "css/app.[contenthash].min.css",
-        allChunks: true
+        filename: "[name].[contenthash].css",
+        chunkFileName: "[name].[contenthash].css"
     }),<%}%>
   ]
 });

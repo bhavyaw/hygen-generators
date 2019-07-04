@@ -55,7 +55,8 @@ module.exports = {
         "@babel/plugin-transform-runtime",<% if(language === 'ts') {%>
         "@babel/proposal-class-properties",
         "@babel/proposal-object-rest-spread"<%}%>
-        "babel-plugin-lodash"
+        "babel-plugin-lodash",
+        "babel-plugin-syntax-dynamic-import"
     ],
     env: {
         "production": {

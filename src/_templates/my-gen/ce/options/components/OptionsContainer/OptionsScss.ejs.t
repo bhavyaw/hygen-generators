@@ -22,9 +22,3 @@ body {
 .cursor-na {
   cursor: not-allowed;
 }
-
-input[disabled],
-select[disabled],
-button[disabled] {
-  @extend .cursor-na;
-}

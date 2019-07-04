@@ -5,6 +5,8 @@ import { APP_CONSTANTS } from '../appConstants';<% if (viewLibrary === 'react') 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import PopupContainer from './PopupContainer/PopupContainer';<%}%>
+import {showDesktopNotification} from 'common/utils';
+
 
 console.log("inside popup script");
 startPopUpScript();
@@ -12,6 +14,7 @@ startPopUpScript();
 function startPopUpScript() {
   initialize();
   // inter exchange message handler
+  showDesktopNotification("Popup Started");
 }
 
 function initialize() {<% if (viewLibrary === 'react') {%>

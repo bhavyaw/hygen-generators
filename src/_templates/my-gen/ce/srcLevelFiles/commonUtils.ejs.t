@@ -5,7 +5,7 @@ export function timeout(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export function reportError(message, errorDetails, throwError?) {
+export function reportError(message, errorDetails, throwError) {
   console.log('Reporting Error to admin', message, errorDetails);
 
   if (throwError) {

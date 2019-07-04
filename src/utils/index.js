@@ -50,7 +50,7 @@ async function addNewPackage(packageName = "", isDevDependency = true, packageMa
     const isPackageInstalled = get(packageJson, [ dependencyType, package]);
 
     if (isPackageInstalled) {
-      console.log(`${package} is already installed.....skipping installation`);
+      // console.log(`${package} is already installed.....skipping installation`);
     } else {
       await shellExecAsync(`yarn add --silent ${isDevDependency ? "-D" : ""} ${package} `, {}, true);
     }
@@ -58,7 +58,7 @@ async function addNewPackage(packageName = "", isDevDependency = true, packageMa
 }
 
 async function copyFiles(copyFrom, copyTo, recursive = true) {
-  const copyCommand = `cp ${recursive ? "-R" : ""} ${copyFrom} ${copyTo}`;
+  const copyCommand = `cp ${recursive ? "-R" : ""} ${copyFrom}/. ${copyTo}`;
   console.log(`Inside copyFiles : `, copyCommand);
   await shellExecAsync(copyCommand, {}, true);
 }

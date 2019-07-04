@@ -3,6 +3,7 @@ to: "<%= h.src() %>/<%= srcDir %>/background/main.js"
 ---
 import { APP_CONSTANTS } from '../appConstants';
 import { APP_MESSAGES } from '../appMessages';
+import {showDesktopNotification} from 'common/utils';
 
 console.log(`Inside background scripts...`);
 initializeBackgroundScript();
@@ -13,7 +14,7 @@ async function initializeBackgroundScript() {
   // browser start event
   // chrome.runtime.onStartup.addListener(async () => {
   // });
-
+  showDesktopNotification("Extension started in the background!!!");
   handleBrowserStartEvent();
 }
 

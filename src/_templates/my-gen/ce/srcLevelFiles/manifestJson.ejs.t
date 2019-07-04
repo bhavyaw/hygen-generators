@@ -28,9 +28,7 @@ to : "<%= h.src()%>/<%= srcDir %>/manifest.json"
         }
     ],<%}%>
     "background": {
-        "scripts": [
-            "js/background.js"
-        ],
+        "page": "background.html",
         "persistent": <%=extensionModules.includes('persistentBackground') ? true : false %>
     },<% if (extensionModules.includes('webAccessibleScripts')) { %>
     "web_accessible_resources": [

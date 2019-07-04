@@ -123,7 +123,14 @@ async function addConfigToPackageJson (promptAnswers) {
   jsonToAppend["scripts"] = get(packageScripts, "webpack");
   jsonToAppend["browserslist"] = browserslist;
   // to enable tree shaking
-  jsonToAppend["sideEffects"] = false;
+  jsonToAppend["sideEffects"] = [
+    "*.css"
+  ];
+
+  if (promptAnswers.sass) {
+    jsonToAppend["sideEffects"].push(".scss", ".sass");
+  }
+  
   Object.assign(packageJson, jsonToAppend);
   // console.log("inside addConfigToPackageJson() : ", jsonToAppend);
   // writing to package JSON 
@@ -133,14 +140,14 @@ async function addConfigToPackageJson (promptAnswers) {
 // @priority high
 //TODO - instead of this create separate package.json and just run yarn command - more customizable
 async function executeCommands(promptAnswers) {
-  const assetsPath = path.join(promptAnswers.srcDir, 'assets');
+  const assetsPath = path.normalize(process.cwd() + '/src/assets');
   console.log(`Assets Path is  : `, assetsPath);
   // creating assets directory
   await makeDir(assetsPath);
   // copy assets
   await copyFiles(
-    path.normalize(hygenConfig.templates + '/my-gen/ce/assets'),
-    path.normalize(path.resolve(promptAnswers.srcDir))
+    path.normalize(path.resolve(hygenConfig.templates + '/../assets/ce')),
+    path.normalize(path.resolve(promptAnswers.srcDir + '/assets'))
   );
   // npm packages
   await addNodePackages(promptAnswers);
@@ -159,6 +166,7 @@ async function addNodePackages(promptAnswers) {
     copy-webpack-plugin 
     lodash-webpack-plugin 
     terser-webpack-plugin
+    optimize-css-assets-webpack-plugin
   `);
 
   if (promptAnswers.webpack.includes('CSS')) {
@@ -180,7 +188,7 @@ async function addNodePackages(promptAnswers) {
   if (promptAnswers.language === 'js') {
     await addNewPackage('@babel/core @babel/cli @babel/preset-env babel-loader @babel/runtime');
     // babel plugins
-    await addNewPackage('@babel/plugin-transform-runtime babel-plugin-module-resolver babel-plugin-lodash');
+    await addNewPackage('@babel/plugin-transform-runtime babel-plugin-module-resolver babel-plugin-lodash babel-plugin-syntax-dynamic-import');
   }
 
   if (promptAnswers.language === 'ts') {
