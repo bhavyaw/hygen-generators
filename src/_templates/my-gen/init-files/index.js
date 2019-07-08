@@ -54,7 +54,10 @@ async function addConfigToPackageJson (promptAnswers) {
   const jsonToAppend = {};
 
   if (promptAnswers.linter.includes("eslint")) {
-    jsonToAppend["scripts"] = get(packageScripts, "eslint");
+    const existingScripts = get(packageJson, "scripts") || {};
+    const eslintScripts = get(packageScripts, "eslint");
+    const newScripts = Object.assign({}, existingScripts, eslintScripts);
+    jsonToAppend["scripts"] = newScripts;
     Object.assign(packageJson, jsonToAppend);
     // console.log("inside addConfigToPackageJson() : ", jsonToAppend);
     // writing to package JSON 

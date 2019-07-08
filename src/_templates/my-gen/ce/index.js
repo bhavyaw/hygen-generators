@@ -119,6 +119,9 @@ module.exports = {
 async function addConfigToPackageJson (promptAnswers) {
   console.log("Webpack generator : Writing to package.json file!!!");
   const jsonToAppend = {};
+  const existingScripts = get(packageJson, "scripts") || {};
+  const webpackScripts = get(packageScripts, "webpack");
+  const newScripts = Object.assign({}, existingScripts, webpackScripts);
   const browserslist = {
     "development": [
       "last 10 Chrome versions"
@@ -127,7 +130,7 @@ async function addConfigToPackageJson (promptAnswers) {
       "last 20 Chrome versions"
     ]
   };
-  jsonToAppend["scripts"] = get(packageScripts, "webpack");
+  jsonToAppend["scripts"] = newScripts;
   jsonToAppend["browserslist"] = browserslist;
   // to enable tree shaking
   jsonToAppend["sideEffects"] = [
@@ -164,7 +167,7 @@ async function executeCommands(promptAnswers) {
 //TODO - it would be much better to create a package json template or injection of dependencies and call yarn post that
 async function addNodePackages(promptAnswers) {
   // webpack core
-  await addNewPackage('webpack webpack-cli webpack-dev-server webpack-merge cross-env webpack-glob-entries mini-css-extract-plugin');
+  await addNewPackage('webpack webpack-cli webpack-dev-server webpack-merge cross-env webpack-glob-entries mini-css-extract-plugin', "dev");
   // webpack plugins
   await addNewPackage(`
     clean-webpack-plugin 
