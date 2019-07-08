@@ -174,53 +174,47 @@ async function addNodePackages(promptAnswers) {
     lodash-webpack-plugin 
     terser-webpack-plugin
     optimize-css-assets-webpack-plugin
-  `);
+  `, "dev");
 
   if (promptAnswers.webpack.includes('CSS')) {
-    await addNewPackage('css-loader');
-    await addNewPackage('style-loader');
-    await addNewPackage('mini-css-extract-plugin');
+    await addNewPackage('css-loader style-loader mini-css-extract-plugin', "dev");
   }
 
   if (promptAnswers.webpack.includes('images')) {
-    await addNewPackage('url-loader');
-    await addNewPackage('file-loader');
+    await addNewPackage('url-loader file-loader', "dev");
   }
 
   if (promptAnswers.webpack.includes('fonts')) {
-    await addNewPackage('url-loader');
+    await addNewPackage('url-loader', "dev");
   }
 
   // babel loaders
   if (promptAnswers.language === 'js') {
-    await addNewPackage('@babel/core @babel/cli @babel/preset-env babel-loader @babel/runtime');
+    await addNewPackage('@babel/core @babel/cli @babel/preset-env babel-loader @babel/runtime', "dev");
     // babel plugins
-    await addNewPackage('@babel/plugin-transform-runtime babel-plugin-module-resolver babel-plugin-lodash babel-plugin-syntax-dynamic-import');
+    await addNewPackage('@babel/plugin-transform-runtime babel-plugin-module-resolver babel-plugin-lodash babel-plugin-syntax-dynamic-import', "dev");
   }
 
   if (promptAnswers.language === 'ts') {
-    await addEventListener('@babel/preset-typescript @babel/proposal-class-properties @babel/proposal-object-rest-spread');
+    await addEventListener('@babel/preset-typescript @babel/proposal-class-properties @babel/proposal-object-rest-spread', "dev");
   }
 
   if (promptAnswers.viewLibrary === 'react') {
-    await addNewPackage('@babel/preset-react babel-plugin-transform-react-remove-prop-types');
-    await addNewPackage('prop-types react react-dom', false);
+    await addNewPackage('@babel/preset-react babel-plugin-transform-react-remove-prop-types', "dev");
+    await addNewPackage('prop-types react react-dom');
   }
 
   console.log('inside executeCommands() for styling generator');
   if (promptAnswers.sass) {
-    await addNewPackage("sass-loader resolve-url-loader");
-    await addNewPackage("node-sass");
+    await addNewPackage("sass-loader resolve-url-loader node-sass", "dev");
   }
 
   if (promptAnswers.cssModule === 'normal') {
-    await addNewPackage("sass-loader");
-    await addNewPackage("css-loader");
-    await addNewPackage("style-loader");
+    await addNewPackage("sass-loader css-loader style-loader", "dev");
   }
 
   if (promptAnswers.cssModule === 'babel' && promptAnswers.viewLibrary === 'react') {
-    await addNewPackage('babel-plugin-react-css-modules postcss-scss postcss-nested postcss-import-sync2');
+    await addNewPackage('babel-plugin-react-css-modules postcss-scss postcss-nested postcss-import-sync2', "dev");
   } else if (promptAnswers.viewLibrary !== 'react') {
     console.error(`Babel react css modules work only with react...use normal css modules otherwise`);
   }

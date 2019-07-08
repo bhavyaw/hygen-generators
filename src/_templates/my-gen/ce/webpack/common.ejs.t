@@ -170,6 +170,7 @@ function getPluginConfig() {
         { from: path.join(__dirname, '../<%= srcDir %>/manifest.json') , to: path.join(__dirname, '../dist/') },
       ]),<% if (extensionModules.includes('popup')) { %>
       new HtmlWebpackPlugin({
+        title : "<%= appName %>",
         inject: true,
         chunks: [
           'common~background~popup',
@@ -182,6 +183,7 @@ function getPluginConfig() {
         chunksSortMode : 'manual'
       }),<%}%><% if (extensionModules.includes('options')) { %>
       new HtmlWebpackPlugin({
+        title : "<%= appName %>",
         inject: true,
         chunks: [
           'vendors~background~options',
@@ -194,6 +196,7 @@ function getPluginConfig() {
         chunksSortMode : 'manual'
       }),<%}%>
       new HtmlWebpackPlugin({
+        title : "<%= appName %>",
         inject: true,
         chunks: [
           'common~background~popup',
