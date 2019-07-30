@@ -172,7 +172,7 @@ async function addNodePackages(promptAnswers) {
   await addNewPackage(`
     clean-webpack-plugin 
     webpack-bundle-analyzer 
-    html-webpack-plugin 
+    html-webpack-plugin@next 
     copy-webpack-plugin 
     lodash-webpack-plugin 
     terser-webpack-plugin

@@ -62,7 +62,7 @@ module.exports = {
     plugins : [
       ...getPluginConfig()
     ],
-    optimization : getOptimizationConfig()
+    //optimization : getOptimizationConfig()
 };
 
 
@@ -172,11 +172,7 @@ function getPluginConfig() {
       new HtmlWebpackPlugin({
         title : "<%= appName %>",
         inject: true,
-        chunks: [
-          'common~background~popup',
-          'vendors~options~popup',
-          'popup'
-        ],
+        chunks: ['popup'],
         filename: path.join(__dirname, '../dist/popup.html'),
         template : path.join(__dirname, '../src/popup/popup.html'),
         minify : getHtmlMinificationConfig(),
@@ -185,24 +181,16 @@ function getPluginConfig() {
       new HtmlWebpackPlugin({
         title : "<%= appName %>",
         inject: true,
-        chunks: [
-          'vendors~background~options',
-          'vendors~options~popup',
-          'options'
-        ],
+        chunks: ['options'],
         filename: path.join(__dirname, '../dist/options.html'),
         template : path.join(__dirname, '../src/options/options.html'),
         minify : getHtmlMinificationConfig(),
         chunksSortMode : 'manual'
       }),<%}%>
       new HtmlWebpackPlugin({
-        title : "<%= appName %>",
+        title : "<%= appName %>", 
         inject: true,
-        chunks: [
-          'common~background~popup',
-          'vendors~background~options',
-          'background'
-        ],
+        chunks: ['background'],
         filename: path.join(__dirname, '../dist/background.html'),
         template : path.join(__dirname, '../src/background/background.html'),
         minify : getHtmlMinificationConfig(),
@@ -223,13 +211,18 @@ function getPluginConfig() {
 function getOptimizationConfig() {
   return {
     splitChunks: {
+      automaticNameDelimiter: '-',
       cacheGroups: {
           vendors: {
             test: /[\\/]node_modules[\\/]/i,
-            minSize : 0,
+            minSize: 0,
             minChunks: 2,
-            chunks: 'all',
-            priority : 20
+            // @priority high
+            //TODO - Test this with async chunks i.e code splitting 
+            // if it doesn't work then revert to chunks : 'all'
+            // TODO - Check this with bundle analyzer
+            chunks: chunk => chunk.name !== 'contentScript1',
+            priority: 20,
           },
           common : {
             minSize : 0,
