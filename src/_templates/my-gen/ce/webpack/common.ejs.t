@@ -19,6 +19,7 @@ let mainChunks = pick(originalEntriesHash, [
   '<%= extensionModules.includes('popup') ? "popup" : "" %>',
   '<%= extensionModules.includes('options') ? "options" : "" %>',
   '<%= extensionModules.includes('contentScripts') ? "contentScript1" : "" %>',
+  '<%= extensionModules.includes('webAccessScript') ? "webAccessScript" : "" %>',
   'appGlobals',
   'appMessages',
   'appConstants',

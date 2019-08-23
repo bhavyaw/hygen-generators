@@ -63,7 +63,6 @@ async function addConfigToPackageJson (promptAnswers) {
     // writing to package JSON 
     await writePackage(packageJson);
   }
-
 }
 
 async function addNodePackages(promptAnswers) {

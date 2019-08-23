@@ -1,5 +1,5 @@
 ---
-to : "<%= h.src() %>/<%= srcDir %>/common/crxMessenger.js"
+to : "<%= h.src() %>/<%= srcDir %>/common/messenger/crxMessenger.js"
 ---
 import isEmpty from 'lodash/isEmpty';
 import isObject from 'lodash/isObject';
@@ -9,26 +9,13 @@ import isFunction from 'lodash/isFunction';
 import isArray from 'lodash/isArray';
 import isMatch from 'lodash/isMatch';
 import isSet from 'lodash/isSet';
-import get from 'lodash/get';
 import uniq from 'lodash/uniq';
 import isUndefined from 'lodash/isUndefined';
-
-export const EXTENSION_MODULES = {
-  BACKGROUND: 'BACKGROUND',
-  background: 'BACKGROUND',
-  POPUP: 'POPUP',
-  popup: 'POPUP',
-  OPTIONS: 'OPTIONS',
-  options: 'OPTIONS',
-  TAB: 'TAB',
-  tab: 'tab',
-  INJECTED_SCRIPT: 'INJECTED_SCRIPT',
-  injected_script: 'INJECTED_SCRIPT',
-};
+import { getCurrentExtensionModule, EXTENSION_MODULES } from './utils';
 
 // To take care of the missing messages
 const messageSubscriptionMap = new Map();
-const messageSenderLinkMap = new Map();
+const receiveMessagesFromMap = new Map();
 const tabMessageQueueMap = new Map();
 let currentExtensionModule = null;
 let messageReceiverInitialized = false;
@@ -39,7 +26,7 @@ initialize();
  */
 function initialize() {
   console.log('Initializing CRX Messenger');
-  setCurrentExtensionModule();
+  currentExtensionModule = getCurrentExtensionModule();
 }
 
 // add check for content script and background - to use custom function to send and receive messages
@@ -69,56 +56,12 @@ export function subscribe() {
     messageSubscriptionMap.set(message, newMessageListeners);
 
     if (senderModule) {
-      const messageSendersList = messageSenderLinkMap.get(message);
+      const messageSendersList = receiveMessagesFromMap.get(message);
       const newMessageSendersList = messageSendersList
         ? uniq([...messageSendersList, senderModule])
         : [senderModule];
-      messageSenderLinkMap.set(message, newMessageSendersList);
+      receiveMessagesFromMap.set(message, newMessageSendersList);
     }
-  }
-}
-
-function onMessageHandler(messageObj, senderObj, sendResponseCallback) {
-  if (isArray(messageObj)) {
-    messageObj.forEach(singleMessageObj =>
-      onMessageHandler(singleMessageObj, senderObj, sendResponseCallback)
-    );
-
-    return true;
-  }
-
-  const { receiver, data, sender, message } = messageObj;
-  const messageRestrictedSenders = messageSenderLinkMap.get(message);
-
-  if (
-    !messageRestrictedSenders ||
-    (messageRestrictedSenders && messageRestrictedSenders.indexOf(sender) > -1)
-  ) {
-    if (!receiver || (receiver && receiver === currentExtensionModule)) {
-      dispatchMessagesToReceivers(
-        message,
-        data,
-        sendResponseCallback,
-        senderObj
-      );
-    }
-  }
-
-  return true;
-}
-
-function dispatchMessagesToReceivers(
-  message,
-  data,
-  sendResponseCallback,
-  senderObj
-) {
-  const messageListeners = messageSubscriptionMap.get(message);
-
-  if (isArray(messageListeners) && !isEmpty(messageListeners)) {
-    messageListeners.forEach(messageListener => {
-      messageListener(data, sendResponseCallback, senderObj);
-    });
   }
 }
 
@@ -192,6 +135,12 @@ export async function publish() {
       }
       break;
 
+    case (receiverModule === EXTENSION_MODULES.VARIABLE_ACCESS_SCRIPT &&
+      senderModule === EXTENSION_MODULES.TAB) ||
+      (receiverModule === EXTENSION_MODULES.TAB &&
+        senderModule === EXTENSION_MODULES.VARIABLE_ACCESS_SCRIPT):
+      throw new Error(`Use Windows messenger utility for this purpose`);
+
     default:
       chrome.runtime.sendMessage(messageObj, responseCallback); // eslint-disable-line no-undef
       break;
@@ -199,7 +148,7 @@ export async function publish() {
 }
 
 /** *
- * Extended Api's
+ * Extended Api
  */
 
 export function sendMessageFromBackgroundToActiveTab(
@@ -261,6 +210,54 @@ export function sendMessageToTabWithId(tabId, messageObj, responseCallback) {
  *        Internal Functionality
  ************************************************* */
 
+function onMessageHandler(messageObj, senderObj, sendResponseCallback) {
+  if (isArray(messageObj)) {
+    messageObj.forEach(singleMessageObj =>
+      onMessageHandler(singleMessageObj, senderObj, sendResponseCallback)
+    );
+
+    return true;
+  }
+
+  const { receiver, data, sender, message } = messageObj;
+  const messageRestrictedSenders = receiveMessagesFromMap.get(message);
+
+  if (
+    !messageRestrictedSenders ||
+    (messageRestrictedSenders && messageRestrictedSenders.indexOf(sender) > -1)
+  ) {
+    if (!receiver || (receiver && receiver === currentExtensionModule)) {
+      dispatchMessagesToListeners(
+        message,
+        data,
+        sendResponseCallback,
+        senderObj
+      );
+    }
+  }
+
+  return true;
+}
+
+function dispatchMessagesToListeners(
+  message,
+  data,
+  sendResponseCallback,
+  senderObj
+) {
+  const messageListeners = messageSubscriptionMap.get(message);
+
+  if (isArray(messageListeners) && !isEmpty(messageListeners)) {
+    messageListeners.forEach(messageListener => {
+      messageListener(data, sendResponseCallback, senderObj);
+    });
+  }
+}
+
+/** ************************************************
+ *            Utils
+ ************************************************* */
+
 export function validateArguments(
   receiverOrSenderModule,
   message,
@@ -306,6 +303,7 @@ function extractSendMessageArgs(args) {
 
   if (isString(args[0]) && (isString(args[1]) || isString(args[2]))) {
     receiverModule = args[0];
+    receiverModule = receiverModule.toUpperCase();
 
     if (isObject(args[1]) || isFunction(args[1])) {
       receiverModuleOptions = args[1];
@@ -365,6 +363,7 @@ function extractSubscribeMessageArguments(args) {
   /* eslint-disable prefer-destructuring */
   if (isString(args[0]) && isString(args[1])) {
     senderModule = args[0];
+    senderModule = senderModule.toUpperCase();
     message = args[1];
 
     if (isFunction(args[2])) {
@@ -383,75 +382,6 @@ function extractSubscribeMessageArguments(args) {
     message,
     responseCallback,
   };
-}
-
-async function setCurrentExtensionModule() {
-  const manifest = chrome.runtime.getManifest(); // eslint-disable-line no-undef
-  const pageWindowLocation = window.location.href;
-
-  let popupPageFileName = get(manifest, 'browser_action.default_popup', '');
-  let optionsPageFileName = get(manifest, 'options_page', '');
-
-  // console.log(
-  //   'Inside setCurrentExtensionModule() : ',
-  //   manifest,
-  //   popupPageFileName,
-  //   optionsPageFileName
-  // );
-  if (isEmpty(popupPageFileName)) {
-    popupPageFileName = await getPopupFileName();
-  }
-
-  if (isEmpty(optionsPageFileName)) {
-    optionsPageFileName = get(manifest, 'options_ui.page', '');
-  }
-
-  popupPageFileName = popupPageFileName.split('/').pop();
-  optionsPageFileName = optionsPageFileName.split('/').pop();
-
-  /* eslint-disable no-undef */
-  if (
-    chrome &&
-    chrome.extension &&
-    chrome.extension.getBackgroundPage &&
-    chrome.extension.getBackgroundPage() === window
-  ) {
-    currentExtensionModule = EXTENSION_MODULES.BACKGROUND;
-  } else if (
-    chrome &&
-    chrome.extension &&
-    chrome.extension.getBackgroundPage &&
-    chrome.extension.getBackgroundPage() !== window
-  ) {
-    if (pageWindowLocation.includes(popupPageFileName)) {
-      currentExtensionModule = EXTENSION_MODULES.POPUP;
-    } else if (pageWindowLocation.includes(optionsPageFileName)) {
-      currentExtensionModule = EXTENSION_MODULES.OPTIONS;
-    }
-  } else if (!chrome || !chrome.runtime || !chrome.runtime.onMessage) {
-    currentExtensionModule = EXTENSION_MODULES.INJECTED_SCRIPT;
-  } else {
-    currentExtensionModule = EXTENSION_MODULES.TAB;
-  }
-
-  console.log(`Current Extensions Module is : `, currentExtensionModule);
-  /* eslint-enable no-undef */
-}
-
-/** ***************************************************
- *                 UTILS
- *************************************************** */
-
-/**
- * Get popup file name in case its set dynamically using set popup
- */
-async function getPopupFileName() {
-  return new Promise(resolve => {
-    // eslint-disable-next-line no-undef
-    chrome.browserAction.getPopup({}, (popupFileName = '') => {
-      resolve(popupFileName);
-    });
-  });
 }
 
 async function filterTabs(receiverModuleOptions) {
@@ -487,4 +417,3 @@ async function filterTabs(receiverModuleOptions) {
     });
   });
 }
-

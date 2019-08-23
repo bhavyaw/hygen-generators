@@ -1,8 +1,7 @@
 ---
 to : "<%= viewLibrary === 'react' && extensionModules.includes('options') ? ( h.src() + '/' + srcDir + '/options/OptionsContainer/OptionsContainer.jsx' ) : null %>"
 ---
-import React, { useState } from 'react';
-import "<%= './Options' + (sass ? '.scss' : '.css')%>";<% if (cssModule === 'babel') {%>
+import React, { useState } from 'react';<% if (cssModule === 'babel') {%>
 import "<%= './OptionsContainer.module' + (sass ? '.scss' : '.css')%>";<%}%><% if(cssModule === 'normal') { %>
 import Styles from "<%= './OptionsContainer.module' + (sass ? '.scss' : '.css') %>";<%}%>
 

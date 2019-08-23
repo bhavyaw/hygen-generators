@@ -6,7 +6,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import PopupContainer from './PopupContainer/PopupContainer';<%}%>
 import {showDesktopNotification} from 'common/utils';
-
+import "<%= './Popup' + (sass ? '.scss' : '.css')%>";
 
 console.log("inside popup script");
 startPopUpScript();

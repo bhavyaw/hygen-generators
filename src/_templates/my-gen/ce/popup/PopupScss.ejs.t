@@ -1,5 +1,5 @@
 ---
-to : "<%= viewLibrary === 'react' && extensionModules.includes('popup') ? ( h.src() + '/' + srcDir + '/popup/PopupContainer/Popup' + (sass ? '.scss' : '.css') ) : null %>"
+to : "<%= viewLibrary === 'react' && extensionModules.includes('popup') ? ( h.src() + '/' + srcDir + '/popup/Popup' + (sass ? '.scss' : '.css') ) : null %>"
 ---
 /*@import '../../../assets//styles/bootstrap/config';
 @import '../../../assets//styles/bootstrap/bootstrap-ext';*/
@@ -26,12 +26,4 @@ body {
   font-size : 20px;
   overflow: hidden;
   background : url(../../assets/images/papyrus.png);
-}
-
-.cursor-pointer {
-  cursor: pointer;
-}
-
-.cursor-na {
-  cursor: not-allowed;
 }

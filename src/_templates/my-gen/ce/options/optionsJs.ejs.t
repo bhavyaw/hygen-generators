@@ -5,6 +5,7 @@ import { APP_CONSTANTS } from '../appConstants';<% if (viewLibrary === 'react') 
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import OptionsContainer from './OptionsContainer/OptionsContainer';<%}%>
+import "<%= './Options' + (sass ? '.scss' : '.css')%>";
 
 console.log('inside options script!');
 startPopUpScript();

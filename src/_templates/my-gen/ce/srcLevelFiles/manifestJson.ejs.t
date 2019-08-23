@@ -16,7 +16,14 @@ to : "<%= h.src()%>/<%= srcDir %>/manifest.json"
         "128": "./assets/icon128.png"
     },
     "content_security_policy": "script-src 'self'; object-src 'self'",<% if (extensionModules.includes('options')) { %>
-    "options_page": "options.html",<%}%><% if (extensionModules.includes('contentScripts')) {%>
+    <% if (embeddedOptionsPage) {%>
+    "options_ui": {
+        "page": "options.html",
+        "open_in_tab": false
+    },
+    <%}%><% if (!embeddedOptionsPage) {%>
+    "options_page": "options.html",
+    <%}%><%}%><% if (extensionModules.includes('contentScripts')) {%>
     "content_scripts": [
         {
             "matches": [
@@ -30,9 +37,9 @@ to : "<%= h.src()%>/<%= srcDir %>/manifest.json"
     "background": {
         "page": "background.html",
         "persistent": <%=extensionModules.includes('persistentBackground') ? true : false %>
-    },<% if (extensionModules.includes('webAccessibleScripts')) { %>
+    },<% if (extensionModules.includes('webAccessScripts')) { %>
     "web_accessible_resources": [
-        "js/variableAccessScript.js"
+        "js/webAccessScript.js"
     ], <%}%>
     "permissions": [
         "tabs",

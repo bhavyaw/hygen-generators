@@ -55,10 +55,12 @@ module.exports = {
         {name : 'popup', message : 'Popup', value : true},
         {name : 'options', message : 'Options', value : true},
         {name : 'contentScripts', message : "Content Scripts", value : true},
-        {name : 'webAccessibleScripts', message : 'Web Access Scripts', value : true},
+        {name : 'webAccessScript', message : 'Web Access Scripts', value : true},
+        {name : 'customMessenger', message : 'Custom Extension Messenger', value : true},
         {name : 'persistentBackground', message : 'Persistent Background Script ?', value : true},
       ]
     };
+
 
     const webpackRequirements = {
       type : 'multiselect',
@@ -102,7 +104,16 @@ module.exports = {
   
     promptAnswers = await prompter.prompt(initialPrompts);
     // const absoluteSrcDirectoryPath = path.resolve(promptAnswers.srcDir);
+    if (promptAnswers.extensionModules.includes('options')) {
+      Object.assign(promptAnswers, await prompter.prompt({
+        type : 'confirm',
+        name : 'embeddedOptionsPage',
+        message : 'Do you need a embedded options page ?'
+      }));
+    }
   
+    console.log(`Prompt answers : `, promptAnswers);
+    
     Object.assign(promptAnswers, {
       appName : packageJson.name || "",
       description : packageJson.description || "",
@@ -166,6 +177,8 @@ async function executeCommands(promptAnswers) {
 // @priority medium
 //TODO - it would be much better to create a package json template or injection of dependencies and call yarn post that
 async function addNodePackages(promptAnswers) {
+  // lodash
+  await addNewPackage('lodash');
   // webpack core
   await addNewPackage('webpack webpack-cli webpack-dev-server webpack-merge cross-env webpack-glob-entries mini-css-extract-plugin', "dev");
   // webpack plugins
@@ -195,11 +208,15 @@ async function addNodePackages(promptAnswers) {
   if (promptAnswers.language === 'js') {
     await addNewPackage('@babel/core @babel/cli @babel/preset-env babel-loader @babel/runtime', "dev");
     // babel plugins
-    await addNewPackage('@babel/plugin-transform-runtime babel-plugin-module-resolver babel-plugin-lodash babel-plugin-syntax-dynamic-import', "dev");
+    await addNewPackage(`
+      @babel/plugin-transform-runtime 
+      babel-plugin-module-resolver 
+      babel-plugin-lodash 
+      babel-plugin-syntax-dynamic-import`, "dev");
   }
 
   if (promptAnswers.language === 'ts') {
-    await addEventListener('@babel/preset-typescript @babel/proposal-class-properties @babel/proposal-object-rest-spread', "dev");
+    await addEventListener('@babel/preset-typescript @babel/plugin-proposal-class-properties @babel/proposal-class-properties @babel/proposal-object-rest-spread', "dev");
   }
 
   if (promptAnswers.viewLibrary === 'react') {
