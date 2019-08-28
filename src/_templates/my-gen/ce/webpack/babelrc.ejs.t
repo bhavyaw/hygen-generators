@@ -56,7 +56,8 @@ module.exports = {
         "@babel/proposal-class-properties",
         "@babel/proposal-object-rest-spread"<%}%>
         "babel-plugin-lodash",
-        "babel-plugin-syntax-dynamic-import"
+        "babel-plugin-syntax-dynamic-import",
+        "@babel/plugin-proposal-class-properties"
     ],
     env: {
         "production": {

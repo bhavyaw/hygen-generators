@@ -1,5 +1,5 @@
 ---
-to : "<%= h.src() %>/<%= srcDir %>/common/messenger/utils.js"
+to : "<%= extensionModules.customMessenger ? ( h.src() + '/' + srcDir + '/common/messenger/utils.js' ) : null %>"
 ---
 import get from 'lodash/get';
 

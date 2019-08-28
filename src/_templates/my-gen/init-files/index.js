@@ -13,6 +13,7 @@ module.exports = {
         choices : [
           {name : "gitignore", message : "Add a basic gitignore  file to the project", value : true},
           {name : "prettier", message : "Add a basic prettier file to the project", value : true},
+          {name : "vscodeSettings", message : "Is your editor vscode", value : true}
         ]
       }
 

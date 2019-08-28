@@ -1,5 +1,5 @@
 ---
-to : "<%= h.src() %>/<%= srcDir %>/common/messenger/windowsMessenger.js"
+to : "<%= extensionModules.customMessenger ? ( h.src() + '/' + srcDir + '/common/messenger/windowsMessenger.js' ) : null %>"
 ---
 import isString from 'lodash/isString';
 import isEmpty from 'lodash/isEmpty';
