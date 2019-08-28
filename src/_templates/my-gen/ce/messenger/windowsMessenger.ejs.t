@@ -1,5 +1,5 @@
 ---
-to : "<%= extensionModules.customMessenger ? ( h.src() + '/' + srcDir + '/common/messenger/windowsMessenger.js' ) : null %>"
+to : "<%= extensionModules.includes('customMessenger') ? ( h.src() + '/' + srcDir + '/common/messenger/windowsMessenger.js' ) : null %>"
 ---
 import isString from 'lodash/isString';
 import isEmpty from 'lodash/isEmpty';
@@ -11,9 +11,9 @@ import { EXTENSION_MODULES, getCurrentExtensionModule } from './utils';
 export default class WindowsMessenger {
   variableScriptListeners = [];
 
-  variableFetchingFileUrl = null;
+  webAccessScriptFetchingUrl = null;
 
-  variableAccessScriptLoaded = false;
+  webAccessScriptLoaded = false;
 
   messageSubscriptionMap = new Map();
 
@@ -28,7 +28,7 @@ export default class WindowsMessenger {
 
     // in case of variable access script we don't inject any script but we have to
     // enable window listeners in order to listen for events. Also, because there's no code sharing
-    // b/w variableAccessScript and contentScripts
+    // b/w webAccessScript and contentScripts
     if (
       this.currentExtensionModule === EXTENSION_MODULES.VARIABLE_ACCESS_SCRIPT
     ) {
@@ -52,7 +52,7 @@ export default class WindowsMessenger {
   sendMessage(message, data) {
     if (
       this.currentExtensionModule === EXTENSION_MODULES.TAB &&
-      !this.variableAccessScriptLoaded
+      !this.webAccessScriptLoaded
     ) {
       throw new Error(`Variable Script is not loaded yet..`);
     }
@@ -97,7 +97,7 @@ export default class WindowsMessenger {
   }
 
   // For content script only
-  async injectVariableAccessScript(variableAccessScriptPath) {
+  async injectWebAccessScript(webAccessScriptPath) {
     if (
       this.currentExtensionModule === EXTENSION_MODULES.VARIABLE_ACCESS_SCRIPT
     ) {
@@ -106,12 +106,12 @@ export default class WindowsMessenger {
       );
     }
 
-    if (!variableAccessScriptPath || !isString(variableAccessScriptPath)) {
+    if (!webAccessScriptPath || !isString(webAccessScriptPath)) {
       throw new Error(`Please enter a valid variableAccess Script Path`);
     }
     // eslint-disable-next-line no-undef
-    this.variableFetchingFileUrl = chrome.extension.getURL(
-      variableAccessScriptPath
+    this.webAccessScriptFetchingUrl = chrome.extension.getURL(
+      webAccessScriptPath
     );
     const existingScriptElem = document.getElementById(
       'ce-variable-access-script'
@@ -122,13 +122,13 @@ export default class WindowsMessenger {
         const scriptElem = document.createElement('script');
         // const chromeRuntimeId = chrome.runtime.id;
         scriptElem.setAttribute('type', 'text/javascript');
-        scriptElem.setAttribute('src', this.variableFetchingFileUrl);
+        scriptElem.setAttribute('src', this.webAccessScriptFetchingUrl);
         scriptElem.setAttribute('id', 'ce-variable-access-script');
         // scriptElem.setAttribute("extensionId", chromeRuntimeId);
         this.headNode.appendChild(scriptElem);
         scriptElem.onload = () => {
           console.log(`External variable access script loaded`);
-          this.variableAccessScriptLoaded = true;
+          this.webAccessScriptLoaded = true;
           this.enableWindowMessageListener();
           resolve();
         };

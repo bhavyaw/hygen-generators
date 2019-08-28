@@ -37,7 +37,7 @@ to : "<%= h.src()%>/<%= srcDir %>/manifest.json"
     "background": {
         "page": "background.html",
         "persistent": <%=extensionModules.includes('persistentBackground') ? true : false %>
-    },<% if (extensionModules.includes('webAccessScripts')) { %>
+    },<% if (extensionModules.includes('webAccessScript')) { %>
     "web_accessible_resources": [
         "js/webAccessScript.js"
     ], <%}%>

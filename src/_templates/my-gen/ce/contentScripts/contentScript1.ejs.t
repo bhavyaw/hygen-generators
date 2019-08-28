@@ -17,9 +17,8 @@ function startContentScript() {
 
 function windowOnloadHandler() {
   console.log(`Page associated with contentScript1 loaded`);
-  insertTestButton();
-  <% if (extensionModules.includes('webAccessScript')) { %>
-    extractPageInfo();
+  insertTestButton();<% if (extensionModules.includes('webAccessScript')) { %>
+  extractPageInfo();
   <%}%>
 }
 <% if (extensionModules.includes('webAccessScript')) { %>
@@ -27,9 +26,7 @@ async function extractPageInfo() {
   windowsMessenger = new WindowsMessenger(window, document.head);
 
   try {
-    await windowsMessenger.injectVariableAccessScript(
-      'js/variableAccessScript.js'
-    );
+    await windowsMessenger.injectWebAccessScript('js/webAccessScript.js');
     windowsMessenger.subscribe('RETURN_MESSAGE', data => {
       console.log(`Inside contentScript1 : `, data);
     });

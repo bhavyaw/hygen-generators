@@ -1,5 +1,5 @@
 ---
-to : "<%= extensionModules.customMessenger ? ( h.src() + '/' + srcDir + '/common/messenger/crxMessenger.js' ) : null %>"
+to : "<%= extensionModules.includes('customMessenger') ? ( h.src() + '/' + srcDir + '/common/messenger/crxMessenger.js' ) : null %>"
 ---
 import isEmpty from 'lodash/isEmpty';
 import isObject from 'lodash/isObject';
