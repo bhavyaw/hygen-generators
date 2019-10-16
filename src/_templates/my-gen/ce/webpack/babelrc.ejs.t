@@ -5,7 +5,7 @@ const env = process.env.BABEL_ENV || process.env.NODE_ENV;
 
 console.log("\n\n****** Inside babelrc. Env is : ", env);
 
-module.exports = {
+const babelOptions = {
     presets: [
         ["@babel/preset-env",{
             "useBuiltIns": false,
@@ -64,8 +64,17 @@ module.exports = {
             "plugins": [
                 "transform-react-remove-prop-types"
             ]
+        },
+        "development" : {
+          "plugins" : [
+            "@babel/plugin-transform-react-jsx"
+          ]
         }
     }
+};
+
+if (env === "development") {
+    babelOptions.plugins.push("transform-react-jsx-source");
 }
 
 function postCssImportResolver(id, basedir, importOptions) {

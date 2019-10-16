@@ -212,7 +212,8 @@ async function addNodePackages(promptAnswers) {
       @babel/plugin-transform-runtime 
       babel-plugin-module-resolver 
       babel-plugin-lodash 
-      babel-plugin-syntax-dynamic-import`, "dev");
+      babel-plugin-syntax-dynamic-import
+      @babel/plugin-transform-react-jsx`, "dev");
   }
 
   if (promptAnswers.language === 'ts') {
