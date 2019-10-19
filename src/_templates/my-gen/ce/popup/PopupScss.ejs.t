@@ -1,5 +1,5 @@
 ---
-to : "<%= viewLibrary === 'react' && extensionModules.includes('popup') ? ( h.src() + '/' + srcDir + '/popup/Popup' + (sass ? '.scss' : '.css') ) : null %>"
+to : "<%= extensionModules.includes('popup') ? ( h.src() + '/' + srcDir + '/popup/Popup' + (sass ? '.scss' : '.css') ) : null %>"
 ---
 /*@import '../../../assets//styles/bootstrap/config';
 @import '../../../assets//styles/bootstrap/bootstrap-ext';*/

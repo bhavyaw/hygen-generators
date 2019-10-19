@@ -16,12 +16,12 @@ to : "<%= h.src()%>/<%= srcDir %>/manifest.json"
         "128": "./assets/icon128.png"
     },
     "content_security_policy": "script-src 'self'; object-src 'self'",<% if (extensionModules.includes('options')) { %>
-    <% if (embeddedOptionsPage) {%>
+    <% if (extensionModules.includes('embeddedOptionsPage')) {%>
     "options_ui": {
         "page": "options.html",
         "open_in_tab": false
     },
-    <%}%><% if (!embeddedOptionsPage) {%>
+    <%}%><% if (!extensionModules.includes('embeddedOptionsPage')) {%>
     "options_page": "options.html",
     <%}%><%}%><% if (extensionModules.includes('contentScripts')) {%>
     "content_scripts": [

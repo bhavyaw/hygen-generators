@@ -1,5 +1,5 @@
 ---
-to : "<%= viewLibrary === 'react' && extensionModules.includes('popup') ? ( h.src() + '/' + srcDir + '/popup/PopupContainer/PopupContainer.jsx' ) : null %>"
+to : "<%= !viewLibrary.includes('none') && extensionModules.includes('popup') ? ( h.src() + '/' + srcDir + '/popup/PopupContainer/PopupContainer.jsx' ) : null %>"
 ---
 import React, { useState } from 'react';<% if (cssModule === 'babel') {%>
 import "<%= './PopupContainer.module' + (sass ? '.scss' : '.css')%>";<%}%><% if(cssModule === 'normal') { %>

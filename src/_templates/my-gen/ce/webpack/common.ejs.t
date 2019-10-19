@@ -102,7 +102,7 @@ function getRulesConfig() {
           }
         }<%}%>
       ]
-    },<%}%><% if (webpack.css || sass) {%>
+    },<%}%><% if (webpack.includes('css') || sass) {%>
     {
       test: /^((?!module).)*\.<%= sass ? "s?" : "" %>css$/,
       exclude: /\.module\.<%= sass ? "s?" : "" %>css$/, 

@@ -27,17 +27,6 @@ module.exports = {
       ]
     };
 
-    const viewLibrary = {
-      type : 'select',
-      name : 'viewLibrary',
-      message : 'Please select a view library for Popup and options page',
-      choices : [
-        {name : 'none', message : 'none', value : true},
-        {name : 'react', message : 'react', value : true},
-        {name : 'vue', message : 'vue', value : true}
-      ]
-    };
-
     // common to all generators
     const srcDirPathPrompt = {
       type : 'input',
@@ -57,7 +46,8 @@ module.exports = {
         {name : 'contentScripts', message : "Content Scripts", value : true},
         {name : 'webAccessScript', message : 'Web Access Scripts', value : true},
         {name : 'customMessenger', message : 'Custom Extension Messenger', value : true},
-        {name : 'persistentBackground', message : 'Persistent Background Script ?', value : true},
+        {name : 'embeddedOptionsPage',message : 'Embedded Options Page', value: false},
+        {name : 'persistentBackground', message : 'Persistent Background Script ?', value : false},
       ]
     };
 
@@ -79,40 +69,43 @@ module.exports = {
       message : "Do you want to use sass preprocessor for styling ?",
     };
 
-    const cssModulesType = {
+    const viewLibrary = {
       type : 'select',
-      name : 'cssModule',
-      message : 'Select the css module type',
+      name : 'viewLibrary',
+      message : 'Please select a view library for Popup and options page',
       choices : [
-        {name : 'none', message : 'No CSS Modules'},
-        { name : 'normal', message : 'Normal CSS Modules'},
-        { name : 'babel', message : 'Babel Plugin react css modules'}
+        {name : 'none', message : 'none', value : true},
+        {name : 'react', message : 'react', value : true},
+        {name : 'vue', message : 'vue', value : true}
       ]
     };
 
-  
     const initialPrompts = [
       hygenConfigPrompt,
       languageUsedPrompt, 
-      viewLibrary,
-      srcDirPathPrompt, 
+      srcDirPathPrompt,   
       extensionModules,
-      webpackRequirements,
       stylingRequirementsPrompt,
-      cssModulesType
+      viewLibrary,
+      webpackRequirements,
     ];
-  
     promptAnswers = await prompter.prompt(initialPrompts);
-    // const absoluteSrcDirectoryPath = path.resolve(promptAnswers.srcDir);
-    if (promptAnswers.extensionModules.includes('options')) {
+
+    if (promptAnswers.viewLibrary.includes('react')) {
       Object.assign(promptAnswers, await prompter.prompt({
-        type : 'confirm',
-        name : 'embeddedOptionsPage',
-        message : 'Do you need a embedded options page ?'
+        type : 'select',
+        name : 'cssModule',
+        message : 'Select the css module type',
+        choices : [
+          { name : 'none', message : 'No CSS Modules'},
+          { name : 'normal', message : 'Normal CSS Modules'},
+          { name : 'babel', message : 'Babel Plugin react css modules'}
+        ]
       }));
+    } else {
+      promptAnswers['cssModule'] = 'none';
     }
   
-    console.log(`Prompt answers : `, promptAnswers);
     
     Object.assign(promptAnswers, {
       appName : packageJson.name || "",

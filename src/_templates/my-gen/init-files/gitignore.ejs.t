@@ -1,9 +1,9 @@
 ---
 to: "<%= configFiles.includes('gitignore') ? h.src() + '/.gitignore' : null %>"
 ---
-node_modules
+node_modules/*
 *.log
-dist/
+dist/*
 
 ### Environment Files
 /config

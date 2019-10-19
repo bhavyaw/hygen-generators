@@ -1,5 +1,5 @@
 ---
-to : "<%= viewLibrary === 'react' && extensionModules.includes('options') ? ( h.src() + '/' + srcDir + '/options/Options' + (sass ? '.scss' : '.css') ) : null %>"
+to : "<%= extensionModules.includes('options') ? ( h.src() + '/' + srcDir + '/options/Options' + (sass ? '.scss' : '.css') ) : null %>"
 ---
 /*@import '../../../assets//styles/bootstrap/config';
 @import '../../../assets//styles/bootstrap/bootstrap-ext';*/

@@ -58,23 +58,15 @@ const babelOptions = {
         "babel-plugin-lodash",
         "babel-plugin-syntax-dynamic-import",
         "@babel/plugin-proposal-class-properties"
-    ],
-    env: {
-        "production": {
-            "plugins": [
-                "transform-react-remove-prop-types"
-            ]
-        },
-        "development" : {
-          "plugins" : [
-            "@babel/plugin-transform-react-jsx"
-          ]
-        }
-    }
+    ]
 };
 
+module.exports = babelOptions;
+
 if (env === "development") {
-    babelOptions.plugins.push("transform-react-jsx-source");
+    babelOptions.plugins.push("@babel/plugin-transform-react-jsx");
+} else if (env === 'production') {
+    babelOptions.plugins.push("transform-react-remove-prop-types");
 }
 
 function postCssImportResolver(id, basedir, importOptions) {

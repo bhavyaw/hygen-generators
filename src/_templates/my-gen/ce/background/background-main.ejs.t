@@ -2,7 +2,7 @@
 to: "<%= h.src() %>/<%= srcDir %>/background/main.js"
 ---
 import { showDesktopNotification } from 'common/utils';
-import { subscribe } from '../common/crxMessenger';
+import { subscribe } from '../common/messenger/crxMessenger';
 // import { APP_CONSTANTS } from '../appConstants';
 // import { APP_MESSAGES } from '../appMessages';
 

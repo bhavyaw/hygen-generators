@@ -2,6 +2,7 @@
 to : "<%= extensionModules.includes('customMessenger') ? ( h.src() + '/' + srcDir + '/common/messenger/utils.js' ) : null %>"
 ---
 import get from 'lodash/get';
+import isFunction from 'lodash/isFunction';
 
 export const EXTENSION_MODULES = {
   BACKGROUND: 'BACKGROUND',
@@ -13,52 +14,38 @@ export const EXTENSION_MODULES = {
 };
 
 export async function getCurrentExtensionModule() {
-  const manifest = chrome.runtime.getManifest(); // eslint-disable-line no-undef
+  const { runtime } = chrome; // eslint-disable-line no-undef
+  const manifest = isFunction(runtime.getManifest) ? runtime.getManifest() : {}; // eslint-disable-line no-undef
   const pageWindowLocation = window.location.href;
 
   let popupPageFileName = get(manifest, 'browser_action.default_popup', '');
   let optionsPageFileName = get(manifest, 'options_page', '');
   let extensionModule = null;
 
-  // console.log(
-  //   'Inside setCurrentExtensionModule() : ',
-  //   manifest,
-  //   popupPageFileName,
-  //   optionsPageFileName
-  // );
-
   /* eslint-disable no-undef */
-  if (
-    chrome &&
-    chrome.extension &&
-    chrome.extension.getBackgroundPage &&
-    chrome.extension.getBackgroundPage() === window
-  ) {
-    extensionModule = EXTENSION_MODULES.BACKGROUND;
-  } else if (
-    chrome &&
-    chrome.extension &&
-    chrome.extension.getBackgroundPage &&
-    chrome.extension.getBackgroundPage() !== window
-  ) {
-    if (isEmpty(popupPageFileName)) {
-      popupPageFileName = await getPopupFileName();
-    }
+  if (chrome && chrome.extension && chrome.extension.getBackgroundPage) {
+    if (chrome.extension.getBackgroundPage() === window) {
+      extensionModule = EXTENSION_MODULES.BACKGROUND;
+    } else if (chrome.extension.getBackgroundPage() !== window) {
+      if (isEmpty(popupPageFileName)) {
+        popupPageFileName = await getPopupFileName();
+      }
 
-    if (isEmpty(optionsPageFileName)) {
-      optionsPageFileName = get(manifest, 'options_ui.page', '');
-    }
+      if (isEmpty(optionsPageFileName)) {
+        optionsPageFileName = get(manifest, 'options_ui.page', '');
+      }
 
-    popupPageFileName = popupPageFileName.split('/').pop();
-    optionsPageFileName = optionsPageFileName.split('/').pop();
+      popupPageFileName = popupPageFileName.split('/').pop();
+      optionsPageFileName = optionsPageFileName.split('/').pop();
 
-    if (pageWindowLocation.includes(popupPageFileName)) {
-      extensionModule = EXTENSION_MODULES.POPUP;
-    } else if (pageWindowLocation.includes(optionsPageFileName)) {
-      extensionModule = EXTENSION_MODULES.OPTIONS;
+      if (pageWindowLocation.includes(popupPageFileName)) {
+        extensionModule = EXTENSION_MODULES.POPUP;
+      } else if (pageWindowLocation.includes(optionsPageFileName)) {
+        extensionModule = EXTENSION_MODULES.OPTIONS;
+      }
     }
   } else if (!chrome || !chrome.runtime || !chrome.runtime.onMessage) {
-    extensionModule = EXTENSION_MODULES.INJECTED_SCRIPT;
+    extensionModule = EXTENSION_MODULES.VARIABLE_ACCESS_SCRIPT;
   } else {
     extensionModule = EXTENSION_MODULES.TAB;
   }
