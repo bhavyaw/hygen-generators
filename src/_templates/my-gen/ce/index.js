@@ -91,7 +91,7 @@ module.exports = {
     ];
     promptAnswers = await prompter.prompt(initialPrompts);
 
-    if (promptAnswers.viewLibrary.includes('react')) {
+    if (promptAnswers.viewLibrary === 'react') {
       Object.assign(promptAnswers, await prompter.prompt({
         type : 'select',
         name : 'cssModule',
@@ -206,7 +206,8 @@ async function addNodePackages(promptAnswers) {
       babel-plugin-module-resolver 
       babel-plugin-lodash 
       babel-plugin-syntax-dynamic-import
-      @babel/plugin-transform-react-jsx`, "dev");
+      @babel/plugin-transform-react-jsx
+      @babel/plugin-proposal-class-properties`, "dev");
   }
 
   if (promptAnswers.language === 'ts') {

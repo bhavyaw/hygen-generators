@@ -1,7 +1,9 @@
 ---
 to : "<%= h.src() + '/.babelrc.js' %>"
 ---
-const env = process.env.BABEL_ENV || process.env.NODE_ENV;
+const env = process.env.BABEL_ENV || process.env.NODE_ENV;<% if(cssModule === 'babel' && viewLibrary === 'react') {%>
+const path = require('path');
+const context = path.resolve(__dirname, './src');<%}%>
 
 console.log("\n\n****** Inside babelrc. Env is : ", env);
 
@@ -21,14 +23,14 @@ const babelOptions = {
             'babel-plugin-react-css-modules',
             {
                 context: context,
+                exclude: /node_modules/, 
                 generateScopedName: generateClassNames,
                 filetypes: {
                 '.scss': {
                     syntax: 'postcss-scss',
                     plugins: [
                     ['postcss-import-sync2', { resolve: postCssImportResolver }],
-                    'postcss-nested'
-                    ]
+                    'postcss-nested']
                 }
                 },
                 exclude: 'node_modules',

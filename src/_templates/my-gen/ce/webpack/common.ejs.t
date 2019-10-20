@@ -73,7 +73,7 @@ function getRulesConfig() {
       test:/\.[jt]sx?$/,
       exclude: /node_modules/,
       loader: 'babel-loader',
-    },<% if (cssModule === 'normal') { %> 
+    },<% if (cssModule !== 'none') { %> 
     {
       test: /\.module\.<%= sass ? "s?" : "" %>css$/,
       exclude: /node_modules/, 
@@ -97,8 +97,10 @@ function getRulesConfig() {
         {
           loader : 'sass-loader',
           options: {
+            sassOptions: {
               outputStyle: isProduction ? 'compressed' : 'expanded',
               sourceMap: !isProduction,
+            }
           }
         }<%}%>
       ]
@@ -121,8 +123,10 @@ function getRulesConfig() {
         {
           loader : 'sass-loader',
           options: {
+            sassOptions: {
               outputStyle: isProduction ? 'compressed' : 'expanded',
               sourceMap: !isProduction,
+            }
           }
         }<%}%>
       ]
