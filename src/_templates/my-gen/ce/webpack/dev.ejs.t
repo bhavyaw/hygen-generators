@@ -7,7 +7,7 @@ const path = require('path');
 
 const developmentConfig =  merge(common, {
     mode : 'development',
-    devtool : 'source-map',
+    devtool : 'eval-source-map',
     output : {
         path: path.resolve(__dirname, '../dist/js'),
         filename: '[name].js'

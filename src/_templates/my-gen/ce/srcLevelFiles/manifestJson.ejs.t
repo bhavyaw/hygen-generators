@@ -15,7 +15,7 @@ to : "<%= h.src()%>/<%= srcDir %>/manifest.json"
         "48": "./assets/icon48.png",
         "128": "./assets/icon128.png"
     },
-    "content_security_policy": "script-src 'self'; object-src 'self'",<% if (extensionModules.includes('options')) { %>
+    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",<% if (extensionModules.includes('options')) { %>
     <% if (extensionModules.includes('embeddedOptionsPage')) {%>
     "options_ui": {
         "page": "options.html",
